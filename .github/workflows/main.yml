@@ -23,6 +23,6 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4.2.5
         with:
           token: ${{ secrets.ACCESS_TOKEN }}
-          repository-name: yunis-du/yunis.github.io.git
+          repository-name: yunis-du/yunis.github.io
           BRANCH: master
           FOLDER: public
