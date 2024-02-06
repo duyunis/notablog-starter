@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- iOS Safari -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- Chrome, Firefox OS and Opera Status Bar Color -->
+<meta name="theme-color" content="#FFFFFF">
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css">
+<link rel="stylesheet" type="text/css"
+  href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/themes/prism.min.css">
+<link rel="stylesheet" type="text/css" href="css/SourceSansPro.css">
+<link rel="stylesheet" type="text/css" href="css/theme.css">
+<link rel="stylesheet" type="text/css" href="css/notablog.css">
+<!-- Favicon -->
+
+  <link rel="shortcut icon" href="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;📖&lt;/text&gt;&lt;/svg&gt;">
+
+<style>
+  :root {
+    font-size: 20px;
+  }
+</style>
+  <title>机器重启导致Redis启动失败 [Bad file format reading the append only file...]&nbsp;|&nbsp;Notablog</title>
+  <meta property="og:type" content="blog">
+  <meta property="og:title" content="机器重启导致Redis启动失败 [Bad file format reading the append only file...]">
+  
+  
+    <meta property="og:image" content="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;😑&lt;/text&gt;&lt;/svg&gt;">
+  
+  <style>
+    .DateTagBar {
+      margin-top: 1.0rem;
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="Navbar">
+  <a href="index.html">
+    <div class="Navbar__Btn">
+      
+        <span><img class="inline-img-icon" src="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;📖&lt;/text&gt;&lt;/svg&gt;"></span>&nbsp;
+      
+      <span>Home</span>
+    </div>
+  </a>
+  
+    
+  
+    
+  
+    
+  
+    
+      <span class="Navbar__Delim">&centerdot;</span>
+      <a href="about.html">
+        <div class="Navbar__Btn">
+          
+            <span><img class="inline-img-icon" src="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;😀&lt;/text&gt;&lt;/svg&gt;"></span>&nbsp;
+          
+          <span>About</span>
+        </div>
+      </a>
+    
+  
+</nav>
+  <header class="Header">
+    
+    <div class="Header__Spacer Header__Spacer--NoCover">
+    </div>
+    
+      <div class="Header__Icon">
+        <span><img class="inline-img-icon" src="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;😑&lt;/text&gt;&lt;/svg&gt;"></span>
+      </div>
+    
+    <h1 class="Header__Title">机器重启导致Redis启动失败 [Bad file format reading the append only file...]</h1>
+    
+      <div class="DateTagBar">
+        
+          <span class="DateTagBar__Item DateTagBar__Date">Posted on Mon, May 9, 2022</span>
+        
+        
+          <span class="DateTagBar__Item DateTagBar__Tag DateTagBar__Tag--red">
+            <a href="tag/Redis.html">Redis</a>
+          </span>
+        
+      </div>
+    
+  </header>
+  <article id="https://www.notion.so/d384b6bc595a4db798147c33452102bf" class="PageRoot"><div id="https://www.notion.so/4f232eb919c44c2cb51b62bfbe856603" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">错误日志：</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">Bad file format reading the append only file: make a backup of your AOF file, then use ./redis-check-aof --fix &lt;filename&gt;</code></span></span></p></div><div id="https://www.notion.so/536639adb4ba4772832c4a11e35353ca" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">原因是机器重启导致Redis持久化数据同步出现了问题</span></span></p></div><h2 id="https://www.notion.so/78e42b4e5776481c87a95bc557dadd64" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/78e42b4e5776481c87a95bc557dadd64"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">解决方案</span></span></h2><div id="https://www.notion.so/a3cc08a3256341fb985de99225317082" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">根据日志提示我们可以知道需要用Redis自带的工具来修复数据文件</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">redis-check-aof</code></span><span class="SemanticString">
+查找文件</span></span></p></div><pre id="https://www.notion.so/6a3a2269b9ad4967844e36b6a6f8a8bf" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>find / -name redis-check-aof
+</span></span></span></code></pre><div id="https://www.notion.so/841bfa6c833345cc84372f8913ae5710" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">一般在</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">/usr/local/bin</code></span><span class="SemanticString">下</span></span></p></div><div id="https://www.notion.so/64af2abc72c942e9ae8d741a44b81ed6" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">执行修复命令</strong></span></span></p></div><pre id="https://www.notion.so/db87c97041e946dfbc5485e68cb5a347" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>./redis-check-aof --fix /data/appendonly.aof
+</span></span></span></code></pre><div id="https://www.notion.so/afba42e2d00e47e2a34f2dfa7b705acf" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">修复完成之后重新启动Redis即可</span></span></p></div><h2 id="https://www.notion.so/9350d9647c1b4c3d8431bd3e9d1cce94" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/9350d9647c1b4c3d8431bd3e9d1cce94"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">Docker部署解决方案</span></span></h2><div id="https://www.notion.so/b8960cdfb2a146ab9cb961a283c0d05d" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">如果是Docker部署的话我们本机是没有这个修复脚本的，Redis的容器一直在重启导致没法进入到容器内部操作</span></span></p></div><div id="https://www.notion.so/0a3c982934934c00801ed43c7ceceb74" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">以下解决方案是建立在把Redis的持久化文件映射到主机的情况下</strong></span></span></p></div><div id="https://www.notion.so/2f487ed61d394e5e8ea7cf8507315d0f" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">我们可以知道Redis起不来是因为持久化文件同步出现了问题，可以先把旧的文件备份一下，然后再启动Redis容器 进入到容器内部修复备份到文件</span></span></p></div><div id="https://www.notion.so/1a9b8a6fffe74f9c86d27156bcbd95c9" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">进入Redis数据挂载目录</span></span></p></div><pre id="https://www.notion.so/35d7e78b3646455db960a3181aa4296f" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>cd /data/redis
+</span></span></span></code></pre><div id="https://www.notion.so/3ac0347d1deb439083bc7de6703b8a9e" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">备份文件</span></span></p></div><pre id="https://www.notion.so/7dc49a623cd74bd9ac21221c5c1fc377" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>mv appendonly.aof appendonly.aof.bk
+</span></span></span></code></pre><div id="https://www.notion.so/32d7a26e51b048fb9ee4d943a13faf6b" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">启动Redis</span></span></p></div><pre id="https://www.notion.so/07bb68eef8044d838d2d8d5762845bb9" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>docker start [redis容器Id]
+</span></span></span></code></pre><div id="https://www.notion.so/287ebb2d40184567b39d386bbdebb93b" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">进入到容器内部修复文件</span></span></p></div><pre id="https://www.notion.so/ea8024c041854de388e2263ebffd2d17" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>docker exec -it [redis容器Id]
+</span></span></span></code></pre><pre id="https://www.notion.so/52b9cca19bbe439e8b0a64a81c44504a" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>cd /usr/local/bin
+</span></span></span></code></pre><pre id="https://www.notion.so/ede4338d8c5d4d288a59d30ab81e46f6" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>./redis-check-aof --fix /data/appendonly.aof.bk
+</span></span></span></code></pre><div id="https://www.notion.so/7e6f77c6a3554c89a5acb6346447bef4" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">执行成功之后退出容器把容器，替换修复好的数据文件</span></span></p></div><pre id="https://www.notion.so/5355ba9da4234d3cb820010aa038f125" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>cd /data/redis
+rm -rf appendonly.aof
+mv appendonly.aof.bk appendonly.aof
+</span></span></span></code></pre><div id="https://www.notion.so/ade4144f81e64e27a2383cb7a177ccd9" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">重启Redis</span></span></p></div><pre id="https://www.notion.so/6b86781ac86c4a84a8b663ae42f5c946" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>docker restart [redis容器Id]
+</span></span></span></code></pre></article>
+  <footer class="Footer">
+  <div>&copy; Notablog 2023</div>
+  <div>&centerdot;</div>
+  <div>Powered by <a href="https://github.com/dragonman225/notablog" target="_blank"
+      rel="noopener noreferrer">Notablog</a>.
+  </div>
+</footer>
+</body>
+
+</html>
