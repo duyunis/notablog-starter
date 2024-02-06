@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- iOS Safari -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- Chrome, Firefox OS and Opera Status Bar Color -->
+<meta name="theme-color" content="#FFFFFF">
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css">
+<link rel="stylesheet" type="text/css"
+  href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/themes/prism.min.css">
+<link rel="stylesheet" type="text/css" href="css/SourceSansPro.css">
+<link rel="stylesheet" type="text/css" href="css/theme.css">
+<link rel="stylesheet" type="text/css" href="css/notablog.css">
+<!-- Favicon -->
+
+  <link rel="shortcut icon" href="https://www.notion.so/signed/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1f77dc63-fd57-443e-87be-f4fe34a01b1c%2F33a333ec-e8ab-46ba-a2ba-41d00305f0a3%2FIMG_4473.jpg?table=collection&amp;id=5c375d43-ac6b-41d5-916c-20602072e1b0">
+
+<style>
+  :root {
+    font-size: 20px;
+  }
+</style>
+  <title>Fedora36通过systemctl restart service启动失败之后程序通过systemctl再也起不来了&nbsp;|&nbsp;Yunis</title>
+  <meta property="og:type" content="blog">
+  <meta property="og:title" content="Fedora36通过systemctl restart service启动失败之后程序通过systemctl再也起不来了">
+  
+  
+  <style>
+    .DateTagBar {
+      margin-top: 1.0rem;
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="Navbar">
+  <a href="index.html">
+    <div class="Navbar__Btn">
+      
+        <span><img class="inline-img-icon" src="https://www.notion.so/signed/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1f77dc63-fd57-443e-87be-f4fe34a01b1c%2F33a333ec-e8ab-46ba-a2ba-41d00305f0a3%2FIMG_4473.jpg?table=collection&amp;id=5c375d43-ac6b-41d5-916c-20602072e1b0"></span>&nbsp;
+      
+      <span>Home</span>
+    </div>
+  </a>
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      <span class="Navbar__Delim">&centerdot;</span>
+      <a href="about.html">
+        <div class="Navbar__Btn">
+          
+            <span><img class="inline-img-icon" src="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;😀&lt;/text&gt;&lt;/svg&gt;"></span>&nbsp;
+          
+          <span>About</span>
+        </div>
+      </a>
+    
+  
+</nav>
+  <header class="Header">
+    
+      <div class="Header__Cover">
+        <img src="https://www.notion.so/images/page-cover/woodcuts_11.jpg">
+      </div>
+    
+    <div class="Header__Spacer ">
+    </div>
+    
+    <h1 class="Header__Title">Fedora36通过systemctl restart service启动失败之后程序通过systemctl再也起不来了</h1>
+    
+      <div class="DateTagBar">
+        
+          <span class="DateTagBar__Item DateTagBar__Date">Posted on Fri, Sep 1, 2023</span>
+        
+        
+          <span class="DateTagBar__Item DateTagBar__Tag DateTagBar__Tag--default">
+            <a href="tag/Linux.html">Linux</a>
+          </span>
+        
+      </div>
+    
+  </header>
+  <article id="https://www.notion.so/83e45cd0a4f04d6bb9be7cd9e6112229" class="PageRoot"><div id="https://www.notion.so/59642f42eed8452baa8623fc93a41cfd" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">systemctl restart service</code></span><span class="SemanticString">启动程序失败之后通过</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">systemctl start service</code></span><span class="SemanticString">也启动不了
+执行</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">systemctl status xxx.service</code></span><span class="SemanticString">
+如果显示：</span></span></p></div><pre id="https://www.notion.so/18cf2834d28846a9871fe3d1c6d7b189" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>Sep 01 15:19:54 dyz-compiler systemd[1]: micflow-agent.service: Scheduled restart job, restart counter is at 5.
+Sep 01 15:19:54 dyz-compiler systemd[1]: Stopped micflow-agent.service - Micflow Agent.
+Sep 01 15:19:54 dyz-compiler systemd[1]: micflow-agent.service: Start request repeated too quickly.
+Sep 01 15:19:54 dyz-compiler systemd[1]: micflow-agent.service: Failed with result &#x27;exit-code&#x27;.
+Sep 01 15:19:54 dyz-compiler systemd[1]: Failed to start micflow-agent.service - Micflow Agent.
+</span></span></span></code></pre><div id="https://www.notion.so/98ce3e6090334bacbcda4172b8367c68" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">关键信息：</span></span></p></div><ul class="BulletedListWrapper"><li id="https://www.notion.so/a4e96d77184340e68bebc2cf0d4caf4a" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">Stopped xxx</code></span></span></li><li id="https://www.notion.so/f34d5ac8b77f4b1b80c1be673fea03b2" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">Start request repeated too quickly.</code></span></span></li><li id="https://www.notion.so/585afd3623b347da90f6efad498b5ee5" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">Failed with result &#x27;exit-code&#x27;.</code></span></span></li><li id="https://www.notion.so/f8c7e66e5c444754a5aceb7b84f919a3" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">Failed to start xxx</code></span></span></li></ul><div id="https://www.notion.so/8e866ce86f304143b0b5f208dd368afb" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">执行命令：</span></span></p></div><pre id="https://www.notion.so/c3ac311377b54d43b0ad5291dfd73c76" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>journalctl -xe | grep micflow-agent
+</span></span></span></code></pre><div id="https://www.notion.so/192daecfe79449768a49e2f67d54d182" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">如果有：</span></span></p></div><pre id="https://www.notion.so/7fcabbaaaa324385b0140a99c175bfe9" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>SELinux is preventing (ow-agent) from execute access on the file /usr/local/bin/micflow-agent.
+                                                   /usr/local/bin/micflow-agent default label should be bin_t.
+                                                   # /sbin/restorecon -v /usr/local/bin/micflow-agent
+                                                   If you believe that (ow-agent) should be allowed execute access on the micflow-agent file by default.
+</span></span></span></code></pre><div id="https://www.notion.so/f244bb8994dd4b0da22bb25acd6191d8" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">执行：</span></span></p></div><pre id="https://www.notion.so/a1909a03711c4b008254f66f13101187" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>sudo /sbin/restorecon -v /usr/local/bin/micflow-agent
+</span></span></span></code></pre><div id="https://www.notion.so/126643d55f0c4b74b998e16d9d03dee5" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">这样一顿操作下来应该就解决了，接着start你的程序就可以了。</span></span></p></div></article>
+  <footer class="Footer">
+  <div>&copy; Yunis 2023</div>
+  <div>&centerdot;</div>
+  <div>Powered by <a href="https://github.com/dragonman225/notablog" target="_blank"
+      rel="noopener noreferrer">Notablog</a>.
+  </div>
+</footer>
+</body>
+
+</html>

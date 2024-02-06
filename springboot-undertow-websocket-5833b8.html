@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- iOS Safari -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- Chrome, Firefox OS and Opera Status Bar Color -->
+<meta name="theme-color" content="#FFFFFF">
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css">
+<link rel="stylesheet" type="text/css"
+  href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/themes/prism.min.css">
+<link rel="stylesheet" type="text/css" href="css/SourceSansPro.css">
+<link rel="stylesheet" type="text/css" href="css/theme.css">
+<link rel="stylesheet" type="text/css" href="css/notablog.css">
+<!-- Favicon -->
+
+  <link rel="shortcut icon" href="https://www.notion.so/signed/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1f77dc63-fd57-443e-87be-f4fe34a01b1c%2F33a333ec-e8ab-46ba-a2ba-41d00305f0a3%2FIMG_4473.jpg?table=collection&amp;id=5c375d43-ac6b-41d5-916c-20602072e1b0">
+
+<style>
+  :root {
+    font-size: 20px;
+  }
+</style>
+  <title>SpringBoot undertow websocket压缩消息&nbsp;|&nbsp;Yunis</title>
+  <meta property="og:type" content="blog">
+  <meta property="og:title" content="SpringBoot undertow websocket压缩消息">
+  
+  
+  <style>
+    .DateTagBar {
+      margin-top: 1.0rem;
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="Navbar">
+  <a href="index.html">
+    <div class="Navbar__Btn">
+      
+        <span><img class="inline-img-icon" src="https://www.notion.so/signed/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1f77dc63-fd57-443e-87be-f4fe34a01b1c%2F33a333ec-e8ab-46ba-a2ba-41d00305f0a3%2FIMG_4473.jpg?table=collection&amp;id=5c375d43-ac6b-41d5-916c-20602072e1b0"></span>&nbsp;
+      
+      <span>Home</span>
+    </div>
+  </a>
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      <span class="Navbar__Delim">&centerdot;</span>
+      <a href="about.html">
+        <div class="Navbar__Btn">
+          
+            <span><img class="inline-img-icon" src="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;😀&lt;/text&gt;&lt;/svg&gt;"></span>&nbsp;
+          
+          <span>About</span>
+        </div>
+      </a>
+    
+  
+</nav>
+  <header class="Header">
+    
+      <div class="Header__Cover">
+        <img src="https://www.notion.so/images/page-cover/rijksmuseum_mignons_1660.jpg">
+      </div>
+    
+    <div class="Header__Spacer ">
+    </div>
+    
+    <h1 class="Header__Title">SpringBoot undertow websocket压缩消息</h1>
+    
+      <div class="DateTagBar">
+        
+          <span class="DateTagBar__Item DateTagBar__Date">Posted on Tue, Aug 9, 2022</span>
+        
+        
+          <span class="DateTagBar__Item DateTagBar__Tag DateTagBar__Tag--brown">
+            <a href="tag/Java.html">Java</a>
+          </span>
+        
+      </div>
+    
+  </header>
+  <article id="https://www.notion.so/5833b8721a834a3984507167d15cbe2e" class="PageRoot"><h2 id="https://www.notion.so/de47af8c2ed14f438e675b55d494b0fd" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/de47af8c2ed14f438e675b55d494b0fd"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">问题描述</span></span></h2><div id="https://www.notion.so/29064627569e4671ad77d83c16c97a63" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">项目开发过程中遇到一个问题，有个websocket接口消息比较大（22M左右）服务器带宽小的情况下一次请求到响应需要十多秒，慢到无法忍受。想到了websocket消息压缩（请求头</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">Sec-WebSocket-Extensions: permessage-deflate;</code></span><span class="SemanticString">)</span></span></p></div><h2 id="https://www.notion.so/193c3df73e274c4291a8cb9f68faaa44" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/193c3df73e274c4291a8cb9f68faaa44"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">golang解决方案</span></span></h2><div id="https://www.notion.so/7c253b6d4bfd4187a3e4b3e6aca1949f" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">goalng用的</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">gorilla/websocket</code></span><span class="SemanticString">库，有配置项可以直接启用</span></span></p></div><pre id="https://www.notion.so/3b645e5f25e143a48e1121c5a656224a" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>d := websocket.Dialer{
+		Proxy:             http.ProxyFromEnvironment,
+		ReadBufferSize:    1024,
+		WriteBufferSize:   1024,
+		EnableCompression: true,  //开启压缩
+}
+</span></span></span></code></pre><div id="https://www.notion.so/226093b89c5d49458cbc63f14f3b1e5b" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">只要打开</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">EnableCompression</code></span><span class="SemanticString">，客户端发来的消息头带有</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">Sec-WebSocket-Extensions: permessage-deflate;</code></span><span class="SemanticString">的话响应头也会带上，把消息压缩。</span></span></p></div><h2 id="https://www.notion.so/00e413bf09424155ab6a94fd004b6212" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/00e413bf09424155ab6a94fd004b6212"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">java解决方案</span></span></h2><div id="https://www.notion.so/c81db2a010ab4e96bc4a673c8ac67993" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">而到了java这边就比较难搞了，用的库是springboot整合websocket。</span></span></p></div><pre id="https://www.notion.so/9ed4f11b7c884c51b075e94cb12ad281" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>&lt;dependency&gt;
+      &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+      &lt;artifactId&gt;spring-boot-starter-websocket&lt;/artifactId&gt;
+      &lt;version&gt;${spring.boot.version}&lt;/version&gt;
+&lt;/dependency&gt;
+
+
+&lt;dependency&gt;
+     &lt;groupId&gt;org.java-websocket&lt;/groupId&gt;
+     &lt;artifactId&gt;Java-WebSocket&lt;/artifactId&gt;
+&lt;/dependency&gt;
+</span></span></span></code></pre><div id="https://www.notion.so/9877e16dfa2d4a09aefe27438f24efc3" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">网上也找不到相关资料，最终通过看源码找到解决方案，以下为解决方案：</span></span></p></div><pre id="https://www.notion.so/e164af89fe9e48e091db4ce78203ee00" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span><span class="token annotation punctuation">@Configuration</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">WebSocketConfig</span> <span class="token punctuation">{</span>
+
+   <span class="token annotation punctuation">@Bean</span>
+   <span class="token keyword">public</span> <span class="token class-name">ServerEndpointExporter</span> <span class="token function">serverEndpointExporter</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+       <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">ServerEndpointExporter</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+   <span class="token punctuation">}</span>
+
+   <span class="token annotation punctuation">@Bean</span>
+   <span class="token keyword">public</span> <span class="token class-name">DefaultHandshakeHandler</span> <span class="token function">defaultHandshakeHandler</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+       <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">DefaultHandshakeHandler</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+   <span class="token punctuation">}</span>
+
+   <span class="token annotation punctuation">@Bean</span>
+   <span class="token keyword">public</span> <span class="token class-name">PerMessageDeflateHandshake</span> <span class="token function">perMessageDeflateHandshake</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+       <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">PerMessageDeflateHandshake</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+   <span class="token punctuation">}</span>
+
+   <span class="token annotation punctuation">@Bean</span>
+   <span class="token class-name">MyUndertowWebSocketServletWebServerCustomizer</span> <span class="token function">websocketServletWebServerCustomizer</span><span class="token punctuation">(</span><span class="token class-name">PerMessageDeflateHandshake</span> perMessageDeflateHandshake<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+       <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">MyUndertowWebSocketServletWebServerCustomizer</span><span class="token punctuation">(</span>perMessageDeflateHandshake<span class="token punctuation">)</span><span class="token punctuation">;</span>
+   <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</span></span></span></code></pre><div id="https://www.notion.so/747d479e324c4b50964be2dcc30263b1" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">下面解释一下相应的配置：</span></span></p></div><h3 id="https://www.notion.so/cca4e3a69ce348d481323e452e86d5b0" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/cca4e3a69ce348d481323e452e86d5b0"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">ServerEndpointExporter</code></span><span class="SemanticString">:</span></span></h3><div id="https://www.notion.so/a47ae85dabcf45b38800f73e6d5350a9" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">略过，springboot websocket必要配置。</span></span></p></div><h3 id="https://www.notion.so/86e8844b4ecc411eb501754ecd9888a2" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/86e8844b4ecc411eb501754ecd9888a2"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">DefaultHandshakeHandler</code></span><span class="SemanticString">:</span></span></h3><div id="https://www.notion.so/65264e4a5872452ea4b4666590e984af" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">先看源码</span></span></p></div><pre id="https://www.notion.so/8f01d3324ca24d76b46a55ffd78a583e" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">DefaultHandshakeHandler</span> <span class="token keyword">extends</span> <span class="token class-name">AbstractHandshakeHandler</span> <span class="token keyword">implements</span> <span class="token class-name">ServletContextAware</span> <span class="token punctuation">{</span>
+
+	<span class="token keyword">public</span> <span class="token class-name">DefaultHandshakeHandler</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	<span class="token punctuation">}</span>
+
+	<span class="token keyword">public</span> <span class="token class-name">DefaultHandshakeHandler</span><span class="token punctuation">(</span><span class="token class-name">RequestUpgradeStrategy</span> requestUpgradeStrategy<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+		<span class="token keyword">super</span><span class="token punctuation">(</span>requestUpgradeStrategy<span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token punctuation">}</span>
+
+
+	<span class="token annotation punctuation">@Override</span>
+	<span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">setServletContext</span><span class="token punctuation">(</span><span class="token class-name">ServletContext</span> servletContext<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+		<span class="token class-name">RequestUpgradeStrategy</span> strategy <span class="token operator">=</span> <span class="token function">getRequestUpgradeStrategy</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token keyword">if</span> <span class="token punctuation">(</span>strategy <span class="token keyword">instanceof</span> <span class="token class-name">ServletContextAware</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+			<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token class-name">ServletContextAware</span><span class="token punctuation">)</span> strategy<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">setServletContext</span><span class="token punctuation">(</span>servletContext<span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token punctuation">}</span>
+	<span class="token punctuation">}</span>
+
+<span class="token punctuation">}</span>
+</span></span></span></code></pre><div id="https://www.notion.so/bffd6edafdef4d318b7ca8aa3c63eb9d" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">new</code></span><span class="SemanticString">的是无参构造函数，这里无参构造函数看似是空的，其实有行隐藏代码</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">super()</code></span><span class="SemanticString">
+So:</span></span></p></div><pre id="https://www.notion.so/eb9d1aa6137d4e7085e3e4d2a339357c" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span><span class="token keyword">public</span> <span class="token class-name">DefaultHandshakeHandler</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	<span class="token keyword">super</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</span></span></span></code></pre><div id="https://www.notion.so/48d1068ba689456b9f042ce2fc1b15c1" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">我们直接看父类</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">AbstractHandshakeHandler</code></span></span></p></div><pre id="https://www.notion.so/44399a23fe564b7ea44bae01c1bef54b" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>	<span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">final</span> <span class="token keyword">boolean</span> tomcatWsPresent<span class="token punctuation">;</span>
+
+	<span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">final</span> <span class="token keyword">boolean</span> jettyWsPresent<span class="token punctuation">;</span>
+
+	<span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">final</span> <span class="token keyword">boolean</span> jetty10WsPresent<span class="token punctuation">;</span>
+
+	<span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">final</span> <span class="token keyword">boolean</span> undertowWsPresent<span class="token punctuation">;</span>
+
+	<span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">final</span> <span class="token keyword">boolean</span> glassfishWsPresent<span class="token punctuation">;</span>
+
+	<span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">final</span> <span class="token keyword">boolean</span> weblogicWsPresent<span class="token punctuation">;</span>
+
+	<span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">final</span> <span class="token keyword">boolean</span> websphereWsPresent<span class="token punctuation">;</span>
+
+	<span class="token keyword">static</span> <span class="token punctuation">{</span>
+		<span class="token class-name">ClassLoader</span> classLoader <span class="token operator">=</span> <span class="token class-name">AbstractHandshakeHandler</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">getClassLoader</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+		tomcatWsPresent <span class="token operator">=</span> <span class="token class-name">ClassUtils</span><span class="token punctuation">.</span><span class="token function">isPresent</span><span class="token punctuation">(</span>
+				<span class="token string">"org.apache.tomcat.websocket.server.WsHttpUpgradeHandler"</span><span class="token punctuation">,</span> classLoader<span class="token punctuation">)</span><span class="token punctuation">;</span>
+		jetty10WsPresent <span class="token operator">=</span> <span class="token class-name">ClassUtils</span><span class="token punctuation">.</span><span class="token function">isPresent</span><span class="token punctuation">(</span>
+				<span class="token string">"org.eclipse.jetty.websocket.server.JettyWebSocketServerContainer"</span><span class="token punctuation">,</span> classLoader<span class="token punctuation">)</span><span class="token punctuation">;</span>
+		jettyWsPresent <span class="token operator">=</span> <span class="token class-name">ClassUtils</span><span class="token punctuation">.</span><span class="token function">isPresent</span><span class="token punctuation">(</span>
+				<span class="token string">"org.eclipse.jetty.websocket.server.WebSocketServerFactory"</span><span class="token punctuation">,</span> classLoader<span class="token punctuation">)</span><span class="token punctuation">;</span>
+		undertowWsPresent <span class="token operator">=</span> <span class="token class-name">ClassUtils</span><span class="token punctuation">.</span><span class="token function">isPresent</span><span class="token punctuation">(</span>
+				<span class="token string">"io.undertow.websockets.jsr.ServerWebSocketContainer"</span><span class="token punctuation">,</span> classLoader<span class="token punctuation">)</span><span class="token punctuation">;</span>
+		glassfishWsPresent <span class="token operator">=</span> <span class="token class-name">ClassUtils</span><span class="token punctuation">.</span><span class="token function">isPresent</span><span class="token punctuation">(</span>
+				<span class="token string">"org.glassfish.tyrus.servlet.TyrusHttpUpgradeHandler"</span><span class="token punctuation">,</span> classLoader<span class="token punctuation">)</span><span class="token punctuation">;</span>
+		weblogicWsPresent <span class="token operator">=</span> <span class="token class-name">ClassUtils</span><span class="token punctuation">.</span><span class="token function">isPresent</span><span class="token punctuation">(</span>
+				<span class="token string">"weblogic.websocket.tyrus.TyrusServletWriter"</span><span class="token punctuation">,</span> classLoader<span class="token punctuation">)</span><span class="token punctuation">;</span>
+		websphereWsPresent <span class="token operator">=</span> <span class="token class-name">ClassUtils</span><span class="token punctuation">.</span><span class="token function">isPresent</span><span class="token punctuation">(</span>
+				<span class="token string">"com.ibm.websphere.wsoc.WsWsocServerContainer"</span><span class="token punctuation">,</span> classLoader<span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token punctuation">}</span>
+</span></span></span></code></pre><div id="https://www.notion.so/2ffff8d1ce5944d1b01123299b3af251" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">部分成员变量和静态代码块，这里可以看到初始化判断了是否存在以上这些web server。</span></span></p></div><div id="https://www.notion.so/a23e4d9d5d4b4f9aabdd68815c8a58a0" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">再看下构造函数</span></span></p></div><pre id="https://www.notion.so/f7dcfc3d5e934e8a80b466a48cd49aaf" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span><span class="token keyword">protected</span> <span class="token class-name">AbstractHandshakeHandler</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	<span class="token keyword">this</span><span class="token punctuation">(</span><span class="token function">initRequestUpgradeStrategy</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</span></span></span></code></pre><div id="https://www.notion.so/23cfdcd389bd4807a686183a24c1c9ae" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">initRequestUpgradeStrategy</code></span><span class="SemanticString">：</span></span></p></div><pre id="https://www.notion.so/f79418e10b2749c48dc560faa43f931c" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span><span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token class-name">RequestUpgradeStrategy</span> <span class="token function">initRequestUpgradeStrategy</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	<span class="token class-name">String</span> className<span class="token punctuation">;</span>
+	<span class="token keyword">if</span> <span class="token punctuation">(</span>tomcatWsPresent<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+		className <span class="token operator">=</span> <span class="token string">"org.springframework.web.socket.server.standard.TomcatRequestUpgradeStrategy"</span><span class="token punctuation">;</span>
+	<span class="token punctuation">}</span>
+	<span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>jettyWsPresent<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+		className <span class="token operator">=</span> <span class="token string">"org.springframework.web.socket.server.jetty.JettyRequestUpgradeStrategy"</span><span class="token punctuation">;</span>
+	<span class="token punctuation">}</span>
+	<span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>jetty10WsPresent<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+		className <span class="token operator">=</span> <span class="token string">"org.springframework.web.socket.server.jetty.Jetty10RequestUpgradeStrategy"</span><span class="token punctuation">;</span>
+	<span class="token punctuation">}</span>
+	<span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>undertowWsPresent<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+		className <span class="token operator">=</span> <span class="token string">"org.springframework.web.socket.server.standard.UndertowRequestUpgradeStrategy"</span><span class="token punctuation">;</span>
+	<span class="token punctuation">}</span>
+	<span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>glassfishWsPresent<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+		className <span class="token operator">=</span> <span class="token string">"org.springframework.web.socket.server.standard.GlassFishRequestUpgradeStrategy"</span><span class="token punctuation">;</span>
+	<span class="token punctuation">}</span>
+	<span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>weblogicWsPresent<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+		className <span class="token operator">=</span> <span class="token string">"org.springframework.web.socket.server.standard.WebLogicRequestUpgradeStrategy"</span><span class="token punctuation">;</span>
+	<span class="token punctuation">}</span>
+	<span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>websphereWsPresent<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+		className <span class="token operator">=</span> <span class="token string">"org.springframework.web.socket.server.standard.WebSphereRequestUpgradeStrategy"</span><span class="token punctuation">;</span>
+	<span class="token punctuation">}</span>
+	<span class="token keyword">else</span> <span class="token punctuation">{</span>
+		<span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">IllegalStateException</span><span class="token punctuation">(</span><span class="token string">"No suitable default RequestUpgradeStrategy found"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token punctuation">}</span>
+
+	<span class="token keyword">try</span> <span class="token punctuation">{</span>
+		<span class="token class-name">Class</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token operator">?</span><span class="token punctuation">></span></span> clazz <span class="token operator">=</span> <span class="token class-name">ClassUtils</span><span class="token punctuation">.</span><span class="token function">forName</span><span class="token punctuation">(</span>className<span class="token punctuation">,</span> <span class="token class-name">AbstractHandshakeHandler</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">getClassLoader</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token keyword">return</span> <span class="token punctuation">(</span><span class="token class-name">RequestUpgradeStrategy</span><span class="token punctuation">)</span> <span class="token class-name">ReflectionUtils</span><span class="token punctuation">.</span><span class="token function">accessibleConstructor</span><span class="token punctuation">(</span>clazz<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">newInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token punctuation">}</span>
+	<span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Exception</span> ex<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+		<span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">IllegalStateException</span><span class="token punctuation">(</span>
+				<span class="token string">"Failed to instantiate RequestUpgradeStrategy: "</span> <span class="token operator">+</span> className<span class="token punctuation">,</span> ex<span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</span></span></span></code></pre><div id="https://www.notion.so/54e1a581bd0141d580d617cb4b7e8591" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">我们用的是</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">undertow</code></span><span class="SemanticString">所以会初始化</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">UndertowRequestUpgradeStrategy</code></span><span class="SemanticString"> 到这一步程序所用的websocket就是</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">undertow</code></span><span class="SemanticString">所封装的了。
+但问题并没有解决，响应头里面没有携带</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">Sec-WebSocket-Extensions: permessage-deflate;</code></span><span class="SemanticString">且消息也没有被压缩。接着看下一个配置</span></span></p></div><h3 id="https://www.notion.so/5382ff2c68d64c41849b5fb071be5228" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/5382ff2c68d64c41849b5fb071be5228"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">PerMessageDeflateHandshake</code></span><span class="SemanticString">:</span></span></h3><div id="https://www.notion.so/1713c7507735407a9bea64f1602d563f" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">配置PerMessageDeflate握手协议PerMessageDeflate扩展</span></span></p></div><h3 id="https://www.notion.so/0f9dafe722ec413fb6420b9cfbcff6b2" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/0f9dafe722ec413fb6420b9cfbcff6b2"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">MyUndertowWebSocketServletWebServerCustomizer</code></span><span class="SemanticString">:</span></span></h3><div id="https://www.notion.so/a9e2b1ef2c6642e4a36a818293697be3" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">自定义配置，关键配置
+通过以上配置已经把websocket切换到了undertow所封装的，springboot自动配置会走这个类</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">org.springframework.boot.autoconfigure.websocket.servlet.UndertowWebSocketServletWebServerCustomizer</code></span></span></p></div><pre id="https://www.notion.so/57222988996147ef9bf1760e66f46a46" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">UndertowWebSocketServletWebServerCustomizer</span>
+		<span class="token keyword">implements</span> <span class="token class-name">WebServerFactoryCustomizer</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">UndertowServletWebServerFactory</span><span class="token punctuation">></span></span><span class="token punctuation">,</span> <span class="token class-name">Ordered</span> <span class="token punctuation">{</span>
+
+	<span class="token annotation punctuation">@Override</span>
+	<span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">customize</span><span class="token punctuation">(</span><span class="token class-name">UndertowServletWebServerFactory</span> factory<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+		<span class="token class-name">WebsocketDeploymentInfoCustomizer</span> customizer <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">WebsocketDeploymentInfoCustomizer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+		factory<span class="token punctuation">.</span><span class="token function">addDeploymentInfoCustomizers</span><span class="token punctuation">(</span>customizer<span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token punctuation">}</span>
+
+	<span class="token annotation punctuation">@Override</span>
+	<span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">getOrder</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+		<span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+	<span class="token punctuation">}</span>
+
+	<span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token class-name">WebsocketDeploymentInfoCustomizer</span> <span class="token keyword">implements</span> <span class="token class-name">UndertowDeploymentInfoCustomizer</span> <span class="token punctuation">{</span>
+
+		<span class="token annotation punctuation">@Override</span>
+		<span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">customize</span><span class="token punctuation">(</span><span class="token class-name">DeploymentInfo</span> deploymentInfo<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+			<span class="token class-name">WebSocketDeploymentInfo</span> info <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">WebSocketDeploymentInfo</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+			deploymentInfo<span class="token punctuation">.</span><span class="token function">addServletContextAttribute</span><span class="token punctuation">(</span><span class="token class-name">WebSocketDeploymentInfo</span><span class="token punctuation">.</span><span class="token constant">ATTRIBUTE_NAME</span><span class="token punctuation">,</span> info<span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token punctuation">}</span>
+
+	<span class="token punctuation">}</span>
+
+<span class="token punctuation">}</span>
+</span></span></span></code></pre><div id="https://www.notion.so/73f445208f804a859a53de1456755215" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">通过断点查看</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">WebSocketDeploymentInfo</code></span><span class="SemanticString">属性</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">extensions</code></span><span class="SemanticString">中并没有</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">PerMessageDeflate</code></span><span class="SemanticString">扩展，因此我们自定义一个带有</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">PerMessageDeflate</code></span><span class="SemanticString">扩展的即可</span></span></p></div><pre id="https://www.notion.so/e02fb916556a4806afb40996daa056eb" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">MyUndertowWebSocketServletWebServerCustomizer</span> <span class="token keyword">implements</span> <span class="token class-name">WebServerFactoryCustomizer</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">UndertowServletWebServerFactory</span><span class="token punctuation">></span></span><span class="token punctuation">,</span> <span class="token class-name">Ordered</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token class-name">ExtensionHandshake</span> extension<span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token class-name">MyUndertowWebSocketServletWebServerCustomizer</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token class-name">MyUndertowWebSocketServletWebServerCustomizer</span><span class="token punctuation">(</span><span class="token class-name">ExtensionHandshake</span> extension<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">MyUndertowWebSocketServletWebServerCustomizer</span><span class="token punctuation">.</span>extension <span class="token operator">=</span> extension<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">customize</span><span class="token punctuation">(</span><span class="token class-name">UndertowServletWebServerFactory</span> factory<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">WebsocketDeploymentInfoCustomizer</span> customizer <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">WebsocketDeploymentInfoCustomizer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        factory<span class="token punctuation">.</span><span class="token function">addDeploymentInfoCustomizers</span><span class="token punctuation">(</span>customizer<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">getOrder</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token class-name">WebsocketDeploymentInfoCustomizer</span> <span class="token keyword">implements</span> <span class="token class-name">UndertowDeploymentInfoCustomizer</span> <span class="token punctuation">{</span>
+
+        <span class="token annotation punctuation">@Override</span>
+        <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">customize</span><span class="token punctuation">(</span><span class="token class-name">DeploymentInfo</span> deploymentInfo<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token class-name">WebSocketDeploymentInfo</span> info <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">WebSocketDeploymentInfo</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>extension <span class="token operator">!=</span> <span class="token keyword">null</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                info<span class="token punctuation">.</span><span class="token function">addExtension</span><span class="token punctuation">(</span>extension<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            deploymentInfo<span class="token punctuation">.</span><span class="token function">addServletContextAttribute</span><span class="token punctuation">(</span><span class="token class-name">WebSocketDeploymentInfo</span><span class="token punctuation">.</span><span class="token constant">ATTRIBUTE_NAME</span><span class="token punctuation">,</span> info<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+    <span class="token punctuation">}</span>
+
+<span class="token punctuation">}</span>
+</span></span></span></code></pre><div id="https://www.notion.so/95d8d1e1f06c474bb3e778decb6ab6bb" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">至此大功告成！</span></span></p></div></article>
+  <footer class="Footer">
+  <div>&copy; Yunis 2023</div>
+  <div>&centerdot;</div>
+  <div>Powered by <a href="https://github.com/dragonman225/notablog" target="_blank"
+      rel="noopener noreferrer">Notablog</a>.
+  </div>
+</footer>
+</body>
+
+</html>

@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- iOS Safari -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- Chrome, Firefox OS and Opera Status Bar Color -->
+<meta name="theme-color" content="#FFFFFF">
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css">
+<link rel="stylesheet" type="text/css"
+  href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/themes/prism.min.css">
+<link rel="stylesheet" type="text/css" href="css/SourceSansPro.css">
+<link rel="stylesheet" type="text/css" href="css/theme.css">
+<link rel="stylesheet" type="text/css" href="css/notablog.css">
+<!-- Favicon -->
+
+  <link rel="shortcut icon" href="https://www.notion.so/signed/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1f77dc63-fd57-443e-87be-f4fe34a01b1c%2F33a333ec-e8ab-46ba-a2ba-41d00305f0a3%2FIMG_4473.jpg?table=collection&amp;id=5c375d43-ac6b-41d5-916c-20602072e1b0">
+
+<style>
+  :root {
+    font-size: 20px;
+  }
+</style>
+  <title>Centos安装k8s with containerd集群&nbsp;|&nbsp;Yunis</title>
+  <meta property="og:type" content="blog">
+  <meta property="og:title" content="Centos安装k8s with containerd集群">
+  
+  
+  <style>
+    .DateTagBar {
+      margin-top: 1.0rem;
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="Navbar">
+  <a href="index.html">
+    <div class="Navbar__Btn">
+      
+        <span><img class="inline-img-icon" src="https://www.notion.so/signed/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1f77dc63-fd57-443e-87be-f4fe34a01b1c%2F33a333ec-e8ab-46ba-a2ba-41d00305f0a3%2FIMG_4473.jpg?table=collection&amp;id=5c375d43-ac6b-41d5-916c-20602072e1b0"></span>&nbsp;
+      
+      <span>Home</span>
+    </div>
+  </a>
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      <span class="Navbar__Delim">&centerdot;</span>
+      <a href="about.html">
+        <div class="Navbar__Btn">
+          
+            <span><img class="inline-img-icon" src="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;😀&lt;/text&gt;&lt;/svg&gt;"></span>&nbsp;
+          
+          <span>About</span>
+        </div>
+      </a>
+    
+  
+</nav>
+  <header class="Header">
+    
+      <div class="Header__Cover">
+        <img src="https://www.notion.so/images/page-cover/webb4.jpg">
+      </div>
+    
+    <div class="Header__Spacer ">
+    </div>
+    
+    <h1 class="Header__Title">Centos安装k8s with containerd集群</h1>
+    
+      <div class="DateTagBar">
+        
+          <span class="DateTagBar__Item DateTagBar__Date">Posted on Fri, Feb 17, 2023</span>
+        
+        
+          <span class="DateTagBar__Item DateTagBar__Tag DateTagBar__Tag--default">
+            <a href="tag/Linux.html">Linux</a>
+          </span>
+        
+          <span class="DateTagBar__Item DateTagBar__Tag DateTagBar__Tag--orange">
+            <a href="tag/k8s.html">k8s</a>
+          </span>
+        
+      </div>
+    
+  </header>
+  <article id="https://www.notion.so/8895e7ae29684428865435bc52295c66" class="PageRoot"><h2 id="https://www.notion.so/89c62128e29042f0bebb184924f17555" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/89c62128e29042f0bebb184924f17555"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">环境</span></span></h2><div id="https://www.notion.so/8e678774134d4d3cb629732b007aef2e" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">三台机器:
+IP: 192.168.100.100 hostname: k8s-master
+IP: 192.168.100.101 hostname: k8s-node1
+IP: 192.168.100.102 hostname: k8s-node2</span></span></p></div><h3 id="https://www.notion.so/1208ee14e8d54812a50ed2cb10596a3d" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/1208ee14e8d54812a50ed2cb10596a3d"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">设置主机名</span></span></h3><div id="https://www.notion.so/38accfc0bb004fa8ac981764fbc582a4" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">100</strong></span><span class="SemanticString">上执行:</span></span></p></div><pre id="https://www.notion.so/d7807ffdc5834b48a7ceeeaf70328157" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>hostnamectl set-hostname k8s-master
+</span></span></span></code></pre><div id="https://www.notion.so/b12564bf0403443285427ccc579d47fe" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">101</strong></span><span class="SemanticString">上执行:</span></span></p></div><pre id="https://www.notion.so/f3cd8cd0664c4dbf95e8edcda0968ef2" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>hostnamectl set-hostname k8s-node1
+</span></span></span></code></pre><div id="https://www.notion.so/d49650d8f5234a6ab3f0e8dede76d7fd" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">102</strong></span><span class="SemanticString">上执行:</span></span></p></div><pre id="https://www.notion.so/f4f7bb799fd04319ab3a0ea39258c838" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>hostnamectl set-hostname k8s-node2
+</span></span></span></code></pre><h2 id="https://www.notion.so/6807937c0c8e4e53b03e1e855412bd59" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/6807937c0c8e4e53b03e1e855412bd59"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">机器配置</span></span></h2><div id="https://www.notion.so/761f685e3bf64962b6367b5d8b2b42cc" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">所有机器上都执行</strong></span></span></p></div><h3 id="https://www.notion.so/fd0afd1b7c344b41899fd8330e7faf09" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/fd0afd1b7c344b41899fd8330e7faf09"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">配置hosts</span></span></h3><pre id="https://www.notion.so/de698064ec624c6e8da3cb1eb0023955" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>vim /etc/hosts
+...
+192.168.100.100   k8s-master
+192.168.100.101   k8s-node1
+192.168.100.102   k8s-node2
+...
+</span></span></span></code></pre><h3 id="https://www.notion.so/2259f146398a43e5840c5ffc9b2fa2af" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/2259f146398a43e5840c5ffc9b2fa2af"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">关闭swap</span></span></h3><pre id="https://www.notion.so/9263baf7b4bc435ab726d649c8bfe8ca" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>swapoff -a
+sed -ri &#x27;s/.*swap.*/#&amp;/&#x27; /etc/fstab
+cat &gt; /etc/sysctl.conf &lt;&lt; EOF
+vm.swappiness=0
+EOF
+
+sysctl -p
+free -m
+</span></span></span></code></pre><blockquote id="https://www.notion.so/726c55a649d944479575ab603f14ba3f" class="ColorfulBlock ColorfulBlock--ColorDefault Quote"><span class="SemanticStringArray"><span class="SemanticString">PS: fedora36 默认安装了zram-generator, 这玩意会自动创建swap，搞了半天都关闭掉，关掉没一会swap就自动创建，直接卸载重启就好了！</span></span></blockquote><h3 id="https://www.notion.so/6973a379667542f5a09c384d18773653" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/6973a379667542f5a09c384d18773653"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">网桥设置</span></span></h3><pre id="https://www.notion.so/5872aacbb1c446fea431c0bf47bb9831" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>cat &lt;&lt;EOF | tee /etc/modules-load.d/k8s.conf
+overlay
+br_netfilter
+EOF
+cat &lt;&lt;EOF | tee /etc/sysctl.d/k8s.conf
+net.bridge.bridge-nf-call-ip6tables = 1
+net.ipv4.ip_forward                 = 1
+net.bridge.bridge-nf-call-iptables = 1
+EOF
+sysctl --system
+modprobe br_netfilter
+modprobe overlay
+lsmod | grep -e br_netfilter -e overlay
+</span></span></span></code></pre><h3 id="https://www.notion.so/28b03635b3244551a93a1d2314dfb64d" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/28b03635b3244551a93a1d2314dfb64d"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">ipvs设置</span></span></h3><pre id="https://www.notion.so/90260b8f912a4b9c9a74d952882acb0d" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>yum install ipset ipvsadm -y
+mkdir -p /etc/sysconfig/modules
+touch /etc/sysconfig/modules/ipvs.modules
+cat &gt; /etc/sysconfig/modules/ipvs.modules &lt;&lt;EOF
+#!/bin/bash
+
+modprobe -- ip_vs
+modprobe -- ip_vs_rr
+modprobe -- ip_vs_wrr
+modprobe -- ip_vs_sh
+modprobe -- nf_conntrack_ipv4
+EOF
+chmod +x /etc/sysconfig/modules/ipvs.modules
+/bin/bash /etc/sysconfig/modules/ipvs.modules
+lsmod | grep -e ip_vs -e nf_conntrack_ipv4
+</span></span></span></code></pre><div id="https://www.notion.so/552a77739a224373b482b03bc2925e45" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">PS:
+如果报错</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">modprobe: FATAL: Module nf_conntrack_ipv4 not found in directory /lib/modules/xxxxxxx.x86_64</code></span><span class="SemanticString">
+说明内核版本过高，高版本的centos内核</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">nf_conntrack_ipv4</code></span><span class="SemanticString">被</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">nf_conntrack</code></span><span class="SemanticString">替换了，吧</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">/etc/sysconfig/modules/ipvs.modules</code></span><span class="SemanticString">中的</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">modprobe -- nf_conntrack_ipv4</code></span><span class="SemanticString">改为</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">modprobe -- nf_conntrack</code></span><span class="SemanticString">即可</span></span></p></div><h3 id="https://www.notion.so/5511c12534264c6d9065a12d636ca3b2" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/5511c12534264c6d9065a12d636ca3b2"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">关闭防火墙</span></span></h3><pre id="https://www.notion.so/8b473bb6d1b74d7a81fe0cff9b63c3d8" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>iptables -F
+iptables -X
+</span></span></span></code></pre><h3 id="https://www.notion.so/7fd93aa38f464eaf832ec668da0fdb3f" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/7fd93aa38f464eaf832ec668da0fdb3f"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">禁用selinux</span></span></h3><pre id="https://www.notion.so/02fc724504aa4ab5b2433ec0d0f63e28" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>getenforce
+setenforce 0
+sed -i &#x27;s/^SELINUX=enforcing$/SELINUX=disabled/g&#x27; /etc/selinux/config
+</span></span></span></code></pre><h3 id="https://www.notion.so/70afc36fce7947058f498402e2432724" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/70afc36fce7947058f498402e2432724"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">添加源</span></span></h3><pre id="https://www.notion.so/0f3034113e0c47e78af8154f2bed2c0e" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>wget &lt;https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo&gt; -O /etc/yum.repos.d/docker-ce.repo
+cat &gt; /etc/yum.repos.d/kubernetes.repo &lt;&lt; EOF
+[kubernetes]
+name=Kubernetes
+baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64
+enabled=1
+gpgcheck=0
+repo_gpgcheck=0
+gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg &lt;https://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg&gt;
+EOF
+</span></span></span></code></pre><h2 id="https://www.notion.so/5befc37849034c52ac0e252db0ac6c80" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/5befc37849034c52ac0e252db0ac6c80"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">集群搭建</span></span></h2><div id="https://www.notion.so/5eab47eef601441f98a182d7a338bcb0" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">所有机器上都执行</strong></span></span></p></div><h3 id="https://www.notion.so/7b98367c05bf4b0ab490f4ef3c10c170" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/7b98367c05bf4b0ab490f4ef3c10c170"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">安装最新的</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">kubectl</code></span><span class="SemanticString"> </span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">kubelet</code></span><span class="SemanticString"> </span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">kubeadm</code></span></span></h3><pre id="https://www.notion.so/35ace3e9a47e46f49c6e0873a979c420" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>yum install  kubectl kubelet kubeadm -y
+systemctl start kubelet.service
+systemctl enable kubelet.service
+</span></span></span></code></pre><h3 id="https://www.notion.so/ea27f6ee41964951b160fa1122205e64" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/ea27f6ee41964951b160fa1122205e64"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">安装containerd</span></span></h3><pre id="https://www.notion.so/55c2d6ca38f3478788e4ee978b2698bf" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>yum install containerd -y
+systemctl start containerd.service
+systemctl enable containerd.service
+</span></span></span></code></pre><h3 id="https://www.notion.so/6bbf639e59c44118b40d6a34550a830e" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/6bbf639e59c44118b40d6a34550a830e"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">配置containerd</span></span></h3><pre id="https://www.notion.so/59e40906d6824417933ac6f05d5c87bb" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>containerd config default | tee /etc/containerd/config.toml
+cat &gt; /etc/containerd/config.toml &lt;&lt; EOF
+disabled_plugins = []
+imports = []
+oom_score = 0
+plugin_dir = &quot;&quot;
+required_plugins = []
+root = &quot;/var/lib/containerd&quot;
+state = &quot;/run/containerd&quot;
+temp = &quot;&quot;
+version = 2
+
+[cgroup]
+  path = &quot;&quot;
+
+[debug]
+  address = &quot;&quot;
+  format = &quot;&quot;
+  gid = 0
+  level = &quot;&quot;
+  uid = 0
+
+[grpc]
+  address = &quot;/run/containerd/containerd.sock&quot;
+  gid = 0
+  max_recv_message_size = 16777216
+  max_send_message_size = 16777216
+  tcp_address = &quot;&quot;
+  tcp_tls_ca = &quot;&quot;
+  tcp_tls_cert = &quot;&quot;
+  tcp_tls_key = &quot;&quot;
+  uid = 0
+
+[metrics]
+  address = &quot;&quot;
+  grpc_histogram = false
+
+[plugins]
+
+  [plugins.&quot;io.containerd.gc.v1.scheduler&quot;]
+    deletion_threshold = 0
+    mutation_threshold = 100
+    pause_threshold = 0.02
+    schedule_delay = &quot;0s&quot;
+    startup_delay = &quot;100ms&quot;
+
+  [plugins.&quot;io.containerd.grpc.v1.cri&quot;]
+    device_ownership_from_security_context = false
+    disable_apparmor = false
+    disable_cgroup = false
+    disable_hugetlb_controller = true
+    disable_proc_mount = false
+    disable_tcp_service = true
+    enable_selinux = false
+    enable_tls_streaming = false
+    enable_unprivileged_icmp = false
+    enable_unprivileged_ports = false
+    ignore_image_defined_volumes = false
+    max_concurrent_downloads = 3
+    max_container_log_line_size = 16384
+    netns_mounts_under_state_dir = false
+    restrict_oom_score_adj = false
+    # 注释上面那行，添加下面这行，注意pause版本
+    sandbox_image = &quot;registry.aliyuncs.com/google_containers/pause:3.8&quot;
+    selinux_category_range = 1024
+    stats_collect_period = 10
+    stream_idle_timeout = &quot;4h0m0s&quot;
+    stream_server_address = &quot;127.0.0.1&quot;
+    stream_server_port = &quot;0&quot;
+    systemd_cgroup = false
+    tolerate_missing_hugetlb_controller = true
+    unset_seccomp_profile = &quot;&quot;
+
+    [plugins.&quot;io.containerd.grpc.v1.cri&quot;.cni]
+      bin_dir = &quot;/opt/cni/bin&quot;
+      conf_dir = &quot;/etc/cni/net.d&quot;
+      conf_template = &quot;&quot;
+      ip_pref = &quot;&quot;
+      max_conf_num = 1
+
+    [plugins.&quot;io.containerd.grpc.v1.cri&quot;.containerd]
+      default_runtime_name = &quot;runc&quot;
+      disable_snapshot_annotations = true
+      discard_unpacked_layers = false
+      ignore_rdt_not_enabled_errors = false
+      no_pivot = false
+      snapshotter = &quot;overlayfs&quot;
+
+      [plugins.&quot;io.containerd.grpc.v1.cri&quot;.containerd.default_runtime]
+        base_runtime_spec = &quot;&quot;
+        cni_conf_dir = &quot;&quot;
+        cni_max_conf_num = 0
+        container_annotations = []
+        pod_annotations = []
+        privileged_without_host_devices = false
+        runtime_engine = &quot;&quot;
+        runtime_path = &quot;&quot;
+        runtime_root = &quot;&quot;
+        runtime_type = &quot;&quot;
+
+        [plugins.&quot;io.containerd.grpc.v1.cri&quot;.containerd.default_runtime.options]
+
+      [plugins.&quot;io.containerd.grpc.v1.cri&quot;.containerd.runtimes]
+
+        [plugins.&quot;io.containerd.grpc.v1.cri&quot;.containerd.runtimes.runc]
+          base_runtime_spec = &quot;&quot;
+          cni_conf_dir = &quot;&quot;
+          cni_max_conf_num = 0
+          container_annotations = []
+          pod_annotations = []
+          privileged_without_host_devices = false
+          runtime_engine = &quot;&quot;
+          runtime_path = &quot;&quot;
+          runtime_root = &quot;&quot;
+          runtime_type = &quot;io.containerd.runc.v2&quot;
+
+          [plugins.&quot;io.containerd.grpc.v1.cri&quot;.containerd.runtimes.runc.options]
+            BinaryName = &quot;&quot;
+            CriuImagePath = &quot;&quot;
+            CriuPath = &quot;&quot;
+            CriuWorkPath = &quot;&quot;
+            IoGid = 0
+            IoUid = 0
+            NoNewKeyring = false
+            NoPivotRoot = false
+            Root = &quot;&quot;
+            ShimCgroup = &quot;&quot;
+            # 修改下面这行
+            SystemdCgroup = true
+
+      [plugins.&quot;io.containerd.grpc.v1.cri&quot;.containerd.untrusted_workload_runtime]
+        base_runtime_spec = &quot;&quot;
+        cni_conf_dir = &quot;&quot;
+        cni_max_conf_num = 0
+        container_annotations = []
+        pod_annotations = []
+        privileged_without_host_devices = false
+        runtime_engine = &quot;&quot;
+        runtime_path = &quot;&quot;
+        runtime_root = &quot;&quot;
+        runtime_type = &quot;&quot;
+
+        [plugins.&quot;io.containerd.grpc.v1.cri&quot;.containerd.untrusted_workload_runtime.options]
+
+    [plugins.&quot;io.containerd.grpc.v1.cri&quot;.image_decryption]
+      key_model = &quot;node&quot;
+
+    [plugins.&quot;io.containerd.grpc.v1.cri&quot;.registry]
+      config_path = &quot;&quot;
+
+      [plugins.&quot;io.containerd.grpc.v1.cri&quot;.registry.auths]
+
+      [plugins.&quot;io.containerd.grpc.v1.cri&quot;.registry.configs]
+
+      [plugins.&quot;io.containerd.grpc.v1.cri&quot;.registry.headers]
+
+      [plugins.&quot;io.containerd.grpc.v1.cri&quot;.registry.mirrors]
+        [plugins.&quot;io.containerd.grpc.v1.cri&quot;.registry.mirrors.&quot;docker.io&quot;]
+          #endpoint = [&quot;&lt;https://registry-1.docker.io&gt;&quot;]
+          # 注释上面那行，添加下面三行
+          endpoint = [&quot;&lt;https://docker.mirrors.ustc.edu.cn&gt;&quot;]
+        [plugins.&quot;io.containerd.grpc.v1.cri&quot;.registry.mirrors.&quot;k8s.gcr.io&quot;]
+          endpoint = [&quot;&lt;https://registry.aliyuncs.com/google_containers&gt;&quot;]
+
+
+    [plugins.&quot;io.containerd.grpc.v1.cri&quot;.x509_key_pair_streaming]
+      tls_cert_file = &quot;&quot;
+      tls_key_file = &quot;&quot;
+
+  [plugins.&quot;io.containerd.internal.v1.opt&quot;]
+    path = &quot;/opt/containerd&quot;
+
+  [plugins.&quot;io.containerd.internal.v1.restart&quot;]
+    interval = &quot;10s&quot;
+
+  [plugins.&quot;io.containerd.internal.v1.tracing&quot;]
+    sampling_ratio = 1.0
+    service_name = &quot;containerd&quot;
+
+  [plugins.&quot;io.containerd.metadata.v1.bolt&quot;]
+    content_sharing_policy = &quot;shared&quot;
+
+  [plugins.&quot;io.containerd.monitor.v1.cgroups&quot;]
+    no_prometheus = false
+
+  [plugins.&quot;io.containerd.runtime.v1.linux&quot;]
+    no_shim = false
+    runtime = &quot;runc&quot;
+    runtime_root = &quot;&quot;
+    shim = &quot;containerd-shim&quot;
+    shim_debug = false
+
+  [plugins.&quot;io.containerd.runtime.v2.task&quot;]
+    platforms = [&quot;linux/amd64&quot;]
+    sched_core = false
+
+  [plugins.&quot;io.containerd.service.v1.diff-service&quot;]
+    default = [&quot;walking&quot;]
+
+  [plugins.&quot;io.containerd.service.v1.tasks-service&quot;]
+    rdt_config_file = &quot;&quot;
+
+  [plugins.&quot;io.containerd.snapshotter.v1.aufs&quot;]
+    root_path = &quot;&quot;
+
+  [plugins.&quot;io.containerd.snapshotter.v1.btrfs&quot;]
+    root_path = &quot;&quot;
+
+  [plugins.&quot;io.containerd.snapshotter.v1.devmapper&quot;]
+    async_remove = false
+    base_image_size = &quot;&quot;
+    discard_blocks = false
+    fs_options = &quot;&quot;
+    fs_type = &quot;&quot;
+    pool_name = &quot;&quot;
+    root_path = &quot;&quot;
+
+  [plugins.&quot;io.containerd.snapshotter.v1.native&quot;]
+    root_path = &quot;&quot;
+
+  [plugins.&quot;io.containerd.snapshotter.v1.overlayfs&quot;]
+    root_path = &quot;&quot;
+    upperdir_label = false
+
+  [plugins.&quot;io.containerd.snapshotter.v1.zfs&quot;]
+    root_path = &quot;&quot;
+
+  [plugins.&quot;io.containerd.tracing.processor.v1.otlp&quot;]
+    endpoint = &quot;&quot;
+    insecure = false
+    protocol = &quot;&quot;
+
+[proxy_plugins]
+
+[stream_processors]
+
+  [stream_processors.&quot;io.containerd.ocicrypt.decoder.v1.tar&quot;]
+    accepts = [&quot;application/vnd.oci.image.layer.v1.tar+encrypted&quot;]
+    args = [&quot;--decryption-keys-path&quot;, &quot;/etc/containerd/ocicrypt/keys&quot;]
+    env = [&quot;OCICRYPT_KEYPROVIDER_CONFIG=/etc/containerd/ocicrypt/ocicrypt_keyprovider.conf&quot;]
+    path = &quot;ctd-decoder&quot;
+    returns = &quot;application/vnd.oci.image.layer.v1.tar&quot;
+
+  [stream_processors.&quot;io.containerd.ocicrypt.decoder.v1.tar.gzip&quot;]
+    accepts = [&quot;application/vnd.oci.image.layer.v1.tar+gzip+encrypted&quot;]
+    args = [&quot;--decryption-keys-path&quot;, &quot;/etc/containerd/ocicrypt/keys&quot;]
+    env = [&quot;OCICRYPT_KEYPROVIDER_CONFIG=/etc/containerd/ocicrypt/ocicrypt_keyprovider.conf&quot;]
+    path = &quot;ctd-decoder&quot;
+    returns = &quot;application/vnd.oci.image.layer.v1.tar+gzip&quot;
+
+[timeouts]
+  &quot;io.containerd.timeout.bolt.open&quot; = &quot;0s&quot;
+  &quot;io.containerd.timeout.shim.cleanup&quot; = &quot;5s&quot;
+  &quot;io.containerd.timeout.shim.load&quot; = &quot;5s&quot;
+  &quot;io.containerd.timeout.shim.shutdown&quot; = &quot;3s&quot;
+  &quot;io.containerd.timeout.task.state&quot; = &quot;2s&quot;
+
+[ttrpc]
+  address = &quot;&quot;
+  gid = 0
+  uid = 0
+EOF
+</span></span></span></code></pre><h3 id="https://www.notion.so/6b1e0761a236450299d6830209a38244" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/6b1e0761a236450299d6830209a38244"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">重启containerd</span></span></h3><pre id="https://www.notion.so/ac3fd2ca62c3494c911357ca4449b40f" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>systemctl daemon-reload
+systemctl restart containerd
+</span></span></span></code></pre><h3 id="https://www.notion.so/ae5848fdbfc84fd2935cc2d37833a00b" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/ae5848fdbfc84fd2935cc2d37833a00b"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">安装crictl</span></span></h3><blockquote id="https://www.notion.so/ae9b3373e9f041deb6fb12e8c933ba18" class="ColorfulBlock ColorfulBlock--ColorDefault Quote"><span class="SemanticStringArray"><span class="SemanticString">CRI 兼容的容器运行时命令行接口</span></span></blockquote><pre id="https://www.notion.so/695d6b61792c4aa7b9f6f511656670b3" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>wget &lt;https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.26.0/crictl-v1.26.0-linux-amd64.tar.gz&gt;
+tar -zxvf crictl-v1.26.0-linux-amd64.tar.gz
+mv crictl /usr/local/bin/
+</span></span></span></code></pre><div id="https://www.notion.so/f8f08832920d486ca92b56df7a02028c" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">编写配置文件</strong></span></span></p></div><pre id="https://www.notion.so/28c35a14c6b44bfbb2118be0cd81171d" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>cat &gt; /etc/crictl.yaml &lt;&lt;EOF
+runtime-endpoint: unix:///var/run/containerd/containerd.sock
+image-endpoint: unix:///var/run/containerd/containerd.sock
+timeout: 10
+debug: false
+pull-image-on-create: false
+EOF
+</span></span></span></code></pre><h3 id="https://www.notion.so/a7760654ff01460c9d1ac655bf51c5e1" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/a7760654ff01460c9d1ac655bf51c5e1"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">通过kubeadm生成默认config文件</span></span></h3><div id="https://www.notion.so/ba863446fb9a4c3bbfc54142033d2b29" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">k8s-master节点执行</strong></span></span></p></div><pre id="https://www.notion.so/7d9a134943cc4b6890ad5395c6826de8" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>kubeadm config print init-defaults --kubeconfig ClusterConfiguration &gt; kubeadm.yml
+</span></span></span></code></pre><div id="https://www.notion.so/7e9154f219ab45c5b7929c6b6383bfd2" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">修改配置文件</span></span></p></div><ul class="BulletedListWrapper"><li id="https://www.notion.so/4f2519f6a7524c62a556b544f4836b6c" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString">修改 criSocket：默认使用docker做为runtime，修改为containerd.sock，使用containerd做为runtime</span></span></li><li id="https://www.notion.so/3d1c91c630ef4e91b0c91729ae9afc0e" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString">修改imageRepository，改为aliyun的镜像仓库地址</span></span></li><li id="https://www.notion.so/7dc6bc197ec64fe3aea5c01b0cc49a5f" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString">修改podSubnet以及serviceSubnet，根据的自己的环境进行设置</span></span></li><li id="https://www.notion.so/6c53f4c2bae94828ba5816553cbb6828" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString">设置cgroupDriver为systemd，非必要</span></span></li><li id="https://www.notion.so/a1cc95f955144ab19dc28db553bf69a5" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString">修改advertiseAddress为正确ip地址或者0.0.0.0</span></span></li></ul><div id="https://www.notion.so/f11f9af158c04ead8ff9611283139c5e" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">修改后的配置:</span></span></p></div><pre id="https://www.notion.so/0b8d99b0036f4da9b7ea73c00f7af86a" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span><span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> kubeadm.k8s.io/v1beta3
+<span class="token key atrule">bootstrapTokens</span><span class="token punctuation">:</span>
+<span class="token punctuation">-</span> <span class="token key atrule">groups</span><span class="token punctuation">:</span>
+  <span class="token punctuation">-</span> system<span class="token punctuation">:</span>bootstrappers<span class="token punctuation">:</span>kubeadm<span class="token punctuation">:</span>default<span class="token punctuation">-</span>node<span class="token punctuation">-</span>token
+  <span class="token key atrule">token</span><span class="token punctuation">:</span> abcdef.0123456789abcdef
+  <span class="token key atrule">ttl</span><span class="token punctuation">:</span> 24h0m0s
+  <span class="token key atrule">usages</span><span class="token punctuation">:</span>
+  <span class="token punctuation">-</span> signing
+  <span class="token punctuation">-</span> authentication
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> InitConfiguration
+<span class="token key atrule">localAPIEndpoint</span><span class="token punctuation">:</span>
+  <span class="token key atrule">advertiseAddress</span><span class="token punctuation">:</span> 0.0.0.0
+  <span class="token key atrule">bindPort</span><span class="token punctuation">:</span> <span class="token number">6443</span>
+<span class="token key atrule">nodeRegistration</span><span class="token punctuation">:</span>
+  <span class="token key atrule">criSocket</span><span class="token punctuation">:</span> unix<span class="token punctuation">:</span>///var/run/containerd/containerd.sock
+  <span class="token key atrule">imagePullPolicy</span><span class="token punctuation">:</span> IfNotPresent
+  <span class="token key atrule">name</span><span class="token punctuation">:</span> node <span class="token comment"># 修改为当前主机名称</span>
+  <span class="token key atrule">taints</span><span class="token punctuation">:</span> <span class="token null important">null</span>
+<span class="token punctuation">---</span>
+<span class="token key atrule">apiServer</span><span class="token punctuation">:</span>
+  <span class="token key atrule">timeoutForControlPlane</span><span class="token punctuation">:</span> 4m0s
+<span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> kubeadm.k8s.io/v1beta3
+<span class="token key atrule">certificatesDir</span><span class="token punctuation">:</span> /etc/kubernetes/pki
+<span class="token key atrule">clusterName</span><span class="token punctuation">:</span> kubernetes
+<span class="token key atrule">controllerManager</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span class="token key atrule">dns</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span class="token key atrule">etcd</span><span class="token punctuation">:</span>
+  <span class="token key atrule">local</span><span class="token punctuation">:</span>
+    <span class="token key atrule">dataDir</span><span class="token punctuation">:</span> /var/lib/etcd
+<span class="token key atrule">imageRepository</span><span class="token punctuation">:</span> registry.aliyuncs.com/google_containers
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> ClusterConfiguration
+<span class="token key atrule">kubernetesVersion</span><span class="token punctuation">:</span> 1.26.0
+<span class="token key atrule">networking</span><span class="token punctuation">:</span>
+  <span class="token key atrule">dnsDomain</span><span class="token punctuation">:</span> cluster.local
+  <span class="token key atrule">podSubnet</span><span class="token punctuation">:</span> 10.10.0.0/16
+  <span class="token key atrule">serviceSubnet</span><span class="token punctuation">:</span> 10.96.0.0/12
+<span class="token key atrule">scheduler</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+</span></span></span></code></pre><h3 id="https://www.notion.so/83b0dbf85fbd412584a85564869215a9" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/83b0dbf85fbd412584a85564869215a9"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">初始化master集群</span></span></h3><div id="https://www.notion.so/3611edeb3bec4ffa9ad36ad4935b53ba" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">k8s-master节点执行</strong></span></span></p></div><pre id="https://www.notion.so/ac059744ad104132ad712ae237345d2d" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>kubeadm reset -f
+kubeadm init --config=kubeadm.yml --upload-certs --ignore-preflight-errors=ImagePull
+</span></span></span></code></pre><div id="https://www.notion.so/78ccb15f63b34f0b9d3f5f5333746720" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">成功会打印以下信息：</span></span></p></div><pre id="https://www.notion.so/664e417ea3004dc0821b8029e29f8143" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>
+Your Kubernetes control-plane has initialized successfully!
+
+To start using your cluster, you need to run the following as a regular user:
+
+  mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+Alternatively, if you are the root user, you can run:
+
+  export KUBECONFIG=/etc/kubernetes/admin.conf
+
+You should now deploy a pod network to the cluster.
+Run &quot;kubectl apply -f [podnetwork].yaml&quot; with one of the options listed at:
+  &lt;https://kubernetes.io/docs/concepts/cluster-administration/addons/&gt;
+
+Then you can join any number of worker nodes by running the following on each as root:
+
+kubeadm join 192.168.100.100:6443 --token abcdef.0123456789abcdef \\
+	--discovery-token-ca-cert-hash sha256:d1380aab2f917975ceb14f77ed8a99d23705afb5f1ac74c1f683a0af7f889efc
+</span></span></span></code></pre><h3 id="https://www.notion.so/9567522fe46a4e9f8f9e67e05b317941" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/9567522fe46a4e9f8f9e67e05b317941"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">设置.kube/config</span></span></h3><div id="https://www.notion.so/159a1307fd454290bae615eb5a8248b1" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">k8s-master节点执行</strong></span></span></p></div><pre id="https://www.notion.so/23d7cad7d89747f6bed61e7bf57c5e98" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+</span></span></span></code></pre><h3 id="https://www.notion.so/1b25b00b7284462ca084a0ef16d24383" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/1b25b00b7284462ca084a0ef16d24383"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">calico网络插件安装</span></span></h3><pre id="https://www.notion.so/4dc97067c8154bc8944c307797b6d38e" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>wget &lt;https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml&gt;
+kubectl apply -f calico.yaml
+</span></span></span></code></pre><h3 id="https://www.notion.so/acfd0d251528468f9c9f61948195e4d6" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/acfd0d251528468f9c9f61948195e4d6"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">k8s-node1</code></span><span class="SemanticString">加入集群</span></span></h3><div id="https://www.notion.so/dfa066efd89644a1b27d38f0081b37ac" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">k8s-node1节点执行</strong></span></span></p></div><pre id="https://www.notion.so/0c0cbf84ddf742c6b9fcbb042ff79fca" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>kubeadm join 192.168.100.100:6443 --token abcdef.0123456789abcdef \\
+	--discovery-token-ca-cert-hash sha256:d1380aab2f917975ceb14f77ed8a99d23705afb5f1ac74c1f683a0af7f889efc
+</span></span></span></code></pre><h3 id="https://www.notion.so/c8bc9790d3f840408881660133a4025c" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/c8bc9790d3f840408881660133a4025c"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">k8s-node2</code></span><span class="SemanticString">加入集群</span></span></h3><div id="https://www.notion.so/9e2a24d21c904ee6b06b6fdc1e78e155" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">k8s-node2节点执行</strong></span></span></p></div><pre id="https://www.notion.so/c8f077d236074bcc8e8b15415531a770" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>kubeadm join 192.168.100.100:6443 --token abcdef.0123456789abcdef \\
+	--discovery-token-ca-cert-hash sha256:d1380aab2f917975ceb14f77ed8a99d23705afb5f1ac74c1f683a0af7f889efc
+</span></span></span></code></pre><h2 id="https://www.notion.so/3968aeafe11f4422ac022a687d0714c6" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/3968aeafe11f4422ac022a687d0714c6"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">kubectl命名补全</span></span></h2><div id="https://www.notion.so/8f750b7a5fa84038be3760101f563818" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">由于</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">kubectl</code></span><span class="SemanticString">命令太多要是没有tab键补全的话实在是影响效率！
+使用</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">bash-completion</code></span><span class="SemanticString">
+安装配置:</span></span></p></div><pre id="https://www.notion.so/87b60a58808643cba5eab3b71033defa" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>yum install bash-completion -y
+cd /usr/share/bash-completion/completions
+kubectl completion bash &gt;kubectl
+wc -l kubectl
+</span></span></span></code></pre></article>
+  <footer class="Footer">
+  <div>&copy; Yunis 2023</div>
+  <div>&centerdot;</div>
+  <div>Powered by <a href="https://github.com/dragonman225/notablog" target="_blank"
+      rel="noopener noreferrer">Notablog</a>.
+  </div>
+</footer>
+</body>
+
+</html>
