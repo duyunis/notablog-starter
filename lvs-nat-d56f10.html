@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- iOS Safari -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- Chrome, Firefox OS and Opera Status Bar Color -->
+<meta name="theme-color" content="#FFFFFF">
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css">
+<link rel="stylesheet" type="text/css"
+  href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/themes/prism.min.css">
+<link rel="stylesheet" type="text/css" href="css/SourceSansPro.css">
+<link rel="stylesheet" type="text/css" href="css/theme.css">
+<link rel="stylesheet" type="text/css" href="css/notablog.css">
+<!-- Favicon -->
+
+  <link rel="shortcut icon" href="https://www.notion.so/signed/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1f77dc63-fd57-443e-87be-f4fe34a01b1c%2F33a333ec-e8ab-46ba-a2ba-41d00305f0a3%2FIMG_4473.jpg?table=collection&amp;id=5c375d43-ac6b-41d5-916c-20602072e1b0">
+
+<style>
+  :root {
+    font-size: 20px;
+  }
+</style>
+  <title>LVS NAT模式部署&nbsp;|&nbsp;Yunis</title>
+  <meta property="og:type" content="blog">
+  <meta property="og:title" content="LVS NAT模式部署">
+  
+  
+  <style>
+    .DateTagBar {
+      margin-top: 1.0rem;
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="Navbar">
+  <a href="index.html">
+    <div class="Navbar__Btn">
+      
+        <span><img class="inline-img-icon" src="https://www.notion.so/signed/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1f77dc63-fd57-443e-87be-f4fe34a01b1c%2F33a333ec-e8ab-46ba-a2ba-41d00305f0a3%2FIMG_4473.jpg?table=collection&amp;id=5c375d43-ac6b-41d5-916c-20602072e1b0"></span>&nbsp;
+      
+      <span>Home</span>
+    </div>
+  </a>
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      <span class="Navbar__Delim">&centerdot;</span>
+      <a href="about.html">
+        <div class="Navbar__Btn">
+          
+            <span><img class="inline-img-icon" src="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;😀&lt;/text&gt;&lt;/svg&gt;"></span>&nbsp;
+          
+          <span>About</span>
+        </div>
+      </a>
+    
+  
+</nav>
+  <header class="Header">
+    
+    <div class="Header__Spacer Header__Spacer--NoCover">
+    </div>
+    
+    <h1 class="Header__Title">LVS NAT模式部署</h1>
+    
+      <div class="DateTagBar">
+        
+          <span class="DateTagBar__Item DateTagBar__Date">Posted on Wed, Feb 7, 2024</span>
+        
+        
+          <span class="DateTagBar__Item DateTagBar__Tag DateTagBar__Tag--default">
+            <a href="tag/Linux.html">Linux</a>
+          </span>
+        
+          <span class="DateTagBar__Item DateTagBar__Tag DateTagBar__Tag--gray">
+            <a href="tag/LVS.html">LVS</a>
+          </span>
+        
+      </div>
+    
+  </header>
+  <article id="https://www.notion.so/d56f1069d6364befa2d3141d5ac51a14" class="PageRoot"><h2 id="https://www.notion.so/58c6eff1cc3a4f1fb95b9ff05a8ee41a" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/58c6eff1cc3a4f1fb95b9ff05a8ee41a"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">实践 LVS NAT 模式</span></span></h2><h3 id="https://www.notion.so/1e3445a789204588869bbd746c8446d7" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/1e3445a789204588869bbd746c8446d7"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">实验环境</span></span></h3><div id="https://www.notion.so/867b90d527d34f08a2df252158c5c55f" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">三台服务器，一台作为 Director Server，两台作为 Real Server，Director Server 有一个外网网卡(</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">192.168.100.109</code></span><span class="SemanticString">) 和一个内网ip(</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">10.10.1.2</code></span><span class="SemanticString">)，两个 real server 上只有内网 ip (</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">10.10.1.3</code></span><span class="SemanticString">) 和 (</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">10.10.1.4</code></span><span class="SemanticString">)，并且需要把两个 real server 的内网网关设置为 director 的内网 ip(</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">10.10.1.2</code></span><span class="SemanticString">)</span></span></p></div><h3 id="https://www.notion.so/18f422cf98764b18aa3a50db123b0b30" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/18f422cf98764b18aa3a50db123b0b30"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">安装和配置</span></span></h3><pre id="https://www.notion.so/1d9916817b65436ebe3540d95733b675" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span>yum <span class="token function">install</span> <span class="token parameter variable">-y</span> ipvsadm</span></span></span></code></pre><div id="https://www.notion.so/07a396af48ee457886e625af0a5c0a4e" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">在 Director Server 上编辑 NAT 实现脚本：</span></span></p></div><pre id="https://www.notion.so/6c7beac9912449d393c79bc717bfa2b0" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span><span class="token function">vim</span> lvs_nat.sh</span></span></span></code></pre><pre id="https://www.notion.so/18870be9ff154db7a0e2d1e5de6a3ee9" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span><span class="token shebang important">#! /bin/bash</span>
+<span class="token comment"># Director 服务器上开启路由转发功能:</span>
+<span class="token builtin class-name">echo</span> <span class="token number">1</span> <span class="token operator">></span> /proc/sys/net/ipv4/ip_forward
+
+<span class="token comment"># 关闭 icmp 的重定向</span>
+<span class="token builtin class-name">echo</span> <span class="token number">0</span> <span class="token operator">></span> /proc/sys/net/ipv4/conf/all/send_redirects
+<span class="token builtin class-name">echo</span> <span class="token number">0</span> <span class="token operator">></span> /proc/sys/net/ipv4/conf/default/send_redirects
+<span class="token builtin class-name">echo</span> <span class="token number">0</span> <span class="token operator">></span> /proc/sys/net/ipv4/conf/ens3/send_redirects
+<span class="token builtin class-name">echo</span> <span class="token number">0</span> <span class="token operator">></span> /proc/sys/net/ipv4/conf/ens12/send_redirects
+
+<span class="token comment"># director设置 nat 防火墙</span>
+iptables <span class="token parameter variable">-t</span> nat <span class="token parameter variable">-F</span>
+iptables <span class="token parameter variable">-t</span> nat <span class="token parameter variable">-X</span>
+iptables <span class="token parameter variable">-t</span> nat <span class="token parameter variable">-A</span> POSTROUTING <span class="token parameter variable">-s</span> <span class="token number">10.10</span>.1.0/24 <span class="token parameter variable">-j</span> MASQUERADE
+
+<span class="token comment"># director设置 ipvsadm</span>
+<span class="token assign-left variable">IPVSADM</span><span class="token operator">=</span><span class="token string">'/sbin/ipvsadm'</span>
+<span class="token variable">$IPVSADM</span> <span class="token parameter variable">-C</span>
+<span class="token variable">$IPVSADM</span> <span class="token parameter variable">-A</span> <span class="token parameter variable">-t</span> <span class="token number">192.168</span>.100.109:80 <span class="token parameter variable">-s</span> wrr
+<span class="token variable">$IPVSADM</span> <span class="token parameter variable">-a</span> <span class="token parameter variable">-t</span> <span class="token number">192.168</span>.100.109:80 <span class="token parameter variable">-r</span> <span class="token number">10.10</span>.1.3:80 <span class="token parameter variable">-m</span> <span class="token parameter variable">-w</span> <span class="token number">1</span>
+<span class="token variable">$IPVSADM</span> <span class="token parameter variable">-a</span> <span class="token parameter variable">-t</span> <span class="token number">192.168</span>.100.109:80 <span class="token parameter variable">-r</span> <span class="token number">10.10</span>.1.4:80 <span class="token parameter variable">-m</span> <span class="token parameter variable">-w</span> <span class="token number">1</span></span></span></span></code></pre><div id="https://www.notion.so/9b29a032c909482ca17637c71eb06edc" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">保存后，在 Director 上直接运行这个脚本就可以完成 LVS Nat 模式的配置。</span></span></p></div><pre id="https://www.notion.so/3b3c306ee1bb4ac98fcc8bf0aecf0635" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span><span class="token function">chmod</span> +x lvs_nat.sh
+<span class="token function">sh</span> lvs_nat.sh</span></span></span></code></pre><div id="https://www.notion.so/a20d9b3d509148bc8222134528a103ef" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">查看 ipvsadm 设置的规则：</span></span></p></div><pre id="https://www.notion.so/a7979e10d2e5499bacdbf5131283a379" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span>ipvsadm <span class="token parameter variable">-ln</span></span></span></span></code></pre><h3 id="https://www.notion.so/ffae8fea3811468aac7a2cb267755df3" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/ffae8fea3811468aac7a2cb267755df3"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">配置两台RS机器的网关地址</span></span></h3><pre id="https://www.notion.so/d00d2ab596a049828f19e8098e113088" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span><span class="token comment"># ifcfg- 后面的是内网网卡名称</span>
+<span class="token function">vim</span> /etc/sysconfig/network-scripts/ifcfg-ens3
+
+<span class="token assign-left variable">TYPE</span><span class="token operator">=</span>Ethernet
+<span class="token assign-left variable">PROXY_METHOD</span><span class="token operator">=</span>none
+<span class="token assign-left variable">BROWSER_ONLY</span><span class="token operator">=</span>no
+<span class="token assign-left variable">BOOTPROTO</span><span class="token operator">=</span>none
+<span class="token assign-left variable">DEFROUTE</span><span class="token operator">=</span>yes
+<span class="token assign-left variable">IPV4_FAILURE_FATAL</span><span class="token operator">=</span>no
+<span class="token assign-left variable">IPV6INIT</span><span class="token operator">=</span>yes
+<span class="token assign-left variable">IPV6_AUTOCONF</span><span class="token operator">=</span>yes
+<span class="token assign-left variable">IPV6_DEFROUTE</span><span class="token operator">=</span>yes
+<span class="token assign-left variable">IPV6_FAILURE_FATAL</span><span class="token operator">=</span>no
+<span class="token assign-left variable">IPV6_ADDR_GEN_MODE</span><span class="token operator">=</span>stable-privacy
+<span class="token assign-left variable">NAME</span><span class="token operator">=</span>ens3
+<span class="token assign-left variable">UUID</span><span class="token operator">=</span>23bff0bb-0b6f-4a73-865e-79ac9f0f222b
+<span class="token assign-left variable">DEVICE</span><span class="token operator">=</span>ens3
+<span class="token assign-left variable">ONBOOT</span><span class="token operator">=</span>yes
+<span class="token assign-left variable">IPADDR</span><span class="token operator">=</span><span class="token number">10.10</span>.1.3
+<span class="token assign-left variable">PREFIX</span><span class="token operator">=</span><span class="token number">24</span>
+<span class="token assign-left variable">GATEWAY</span><span class="token operator">=</span><span class="token number">10.10</span>.1.2 <span class="token comment"># 这里需要把网关配置为DS的内网IP</span>
+<span class="token assign-left variable">DNS1</span><span class="token operator">=</span><span class="token number">8.8</span>.8.8
+<span class="token assign-left variable">IPV6_PRIVACY</span><span class="token operator">=</span>no</span></span></span></code></pre><div id="https://www.notion.so/afbbf5f2934841eab5ac3fbb4262c1bb" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">另一台RS机器同样的操作</strong></span></span></p></div><h3 id="https://www.notion.so/5de52df5c19d4c069552a6adeaeeb0bb" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/5de52df5c19d4c069552a6adeaeeb0bb"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">分别在两台RS机器上安装Nginx</span></span></h3><pre id="https://www.notion.so/9a29445811d74c7fb8f8a7a636070401" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span>yum <span class="token function">install</span> <span class="token parameter variable">-y</span> nginx
+systemctl start nginx</span></span></span></code></pre><div id="https://www.notion.so/a03f22ed38604ff08211fa5540863d37" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">为了区分开两台RS机器，把 nginx 的默认页修改一下：</span></span></p></div><div id="https://www.notion.so/dcb2d2b80cb8475ca7c610363207773a" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">在 RS1 上执行 ：</span></span></p></div><pre id="https://www.notion.so/99617b48e69540c983b9d345658ab437" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span><span class="token builtin class-name">echo</span> <span class="token string">"RS1"</span> <span class="token operator">></span>/usr/share/nginx/html/index.html</span></span></span></code></pre><div id="https://www.notion.so/2aa246f19a7e4541938e494b58ac2afb" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">在 RS2 上执行：</span></span></p></div><pre id="https://www.notion.so/d459dc28e83744178700501d8b909b1f" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span><span class="token builtin class-name">echo</span> <span class="token string">"RS2"</span> <span class="token operator">></span>/usr/share/nginx/html/index.html</span></span></span></code></pre><h3 id="https://www.notion.so/c17b056276f44c84bd6fdd5e6ea93ac0" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/c17b056276f44c84bd6fdd5e6ea93ac0"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">验证结果</span></span></h3><div id="https://www.notion.so/14003b9e0767407c9b28bcf0e45ac34a" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">通过浏览器测试 2 台机器上的 web内容：</span></span></p></div><div id="https://www.notion.so/bf67e23144504a92be4923cf935b9a91" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString"><a class="SemanticString__Fragment SemanticString__Fragment--Link" href="http://192.168.100.109"><code class="SemanticString__Fragment SemanticString__Fragment--Code">http://192.168.100.109</code></a></span><span class="SemanticString"> </span></span></p></div><div id="https://www.notion.so/f8902c71a6fc409fac618d6da065a14f" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"></span></p></div></article>
+  <footer class="Footer">
+  <div>&copy; Yunis 2023</div>
+  <div>&centerdot;</div>
+  <div>Powered by <a href="https://github.com/dragonman225/notablog" target="_blank"
+      rel="noopener noreferrer">Notablog</a>.
+  </div>
+</footer>
+</body>
+
+</html>
