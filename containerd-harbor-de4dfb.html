@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- iOS Safari -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- Chrome, Firefox OS and Opera Status Bar Color -->
+<meta name="theme-color" content="#FFFFFF">
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css">
+<link rel="stylesheet" type="text/css"
+  href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/themes/prism.min.css">
+<link rel="stylesheet" type="text/css" href="css/SourceSansPro.css">
+<link rel="stylesheet" type="text/css" href="css/theme.css">
+<link rel="stylesheet" type="text/css" href="css/notablog.css">
+<!-- Favicon -->
+
+  <link rel="shortcut icon" href="https://www.notion.so/signed/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1f77dc63-fd57-443e-87be-f4fe34a01b1c%2F33a333ec-e8ab-46ba-a2ba-41d00305f0a3%2FIMG_4473.jpg?table=collection&amp;id=5c375d43-ac6b-41d5-916c-20602072e1b0">
+
+<style>
+  :root {
+    font-size: 20px;
+  }
+</style>
+  <title>containerd 配置私有harbor仓库&nbsp;|&nbsp;Yunis</title>
+  <meta property="og:type" content="blog">
+  <meta property="og:title" content="containerd 配置私有harbor仓库">
+  
+  
+  <style>
+    .DateTagBar {
+      margin-top: 1.0rem;
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="Navbar">
+  <a href="index.html">
+    <div class="Navbar__Btn">
+      
+        <span><img class="inline-img-icon" src="https://www.notion.so/signed/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1f77dc63-fd57-443e-87be-f4fe34a01b1c%2F33a333ec-e8ab-46ba-a2ba-41d00305f0a3%2FIMG_4473.jpg?table=collection&amp;id=5c375d43-ac6b-41d5-916c-20602072e1b0"></span>&nbsp;
+      
+      <span>Home</span>
+    </div>
+  </a>
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      <span class="Navbar__Delim">&centerdot;</span>
+      <a href="about.html">
+        <div class="Navbar__Btn">
+          
+            <span><img class="inline-img-icon" src="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;😀&lt;/text&gt;&lt;/svg&gt;"></span>&nbsp;
+          
+          <span>About</span>
+        </div>
+      </a>
+    
+  
+</nav>
+  <header class="Header">
+    
+    <div class="Header__Spacer Header__Spacer--NoCover">
+    </div>
+    
+    <h1 class="Header__Title">containerd 配置私有harbor仓库</h1>
+    
+      <div class="DateTagBar">
+        
+          <span class="DateTagBar__Item DateTagBar__Date">Posted on Tue, Sep 27, 2022</span>
+        
+        
+          <span class="DateTagBar__Item DateTagBar__Tag DateTagBar__Tag--orange">
+            <a href="tag/k8s.html">k8s</a>
+          </span>
+        
+      </div>
+    
+  </header>
+  <article id="https://www.notion.so/de4dfbfb108a4fadb051ab9bd84c94a5" class="PageRoot"><h2 id="https://www.notion.so/3a761fe100694134b93772c9c6fce9f7" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/3a761fe100694134b93772c9c6fce9f7"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">背景</span></span></h2><blockquote id="https://www.notion.so/467515d87ba145f8932e01a8dcf3a1dd" class="ColorfulBlock ColorfulBlock--ColorDefault Quote"><span class="SemanticStringArray"><span class="SemanticString">k8s-1.20发布之后，不再使用doker作为底层容器运行时，而是默认使用Container Runtime Interface(CRI)</span></span></blockquote><h2 id="https://www.notion.so/952257ff3bfc4ae08c6ed0a7f4bb2f4d" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/952257ff3bfc4ae08c6ed0a7f4bb2f4d"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">系统版本</span></span></h2><div id="https://www.notion.so/27625a343bec419083d9fd4a3e8dade0" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">CentOS 8.2</strong></span></span></p></div><h2 id="https://www.notion.so/e64e1f5a11b447648d9f66006b200e46" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/e64e1f5a11b447648d9f66006b200e46"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">安装Harbor</span></span></h2><blockquote id="https://www.notion.so/5263475ec3d846389336b8659a1b1b60" class="ColorfulBlock ColorfulBlock--ColorDefault Quote"><span class="SemanticStringArray"><span class="SemanticString">Harbor支持在线和离线安装方式，这里，建议使用离线方式，先下载Harbor安装包:https://github.com/goharbor/harbor/releases</span></span></blockquote><h3 id="https://www.notion.so/4042735a1dbc4e9191d57c2f2de43997" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/4042735a1dbc4e9191d57c2f2de43997"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">前提</span></span></h3><div id="https://www.notion.so/961d474722b440198b12136cfb78eae4" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">使用</span><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">docker-compose</strong></span><span class="SemanticString">部署方式，需要依赖</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">docker</code></span><span class="SemanticString">,</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">docker-compose</code></span></span></p></div><div id="https://www.notion.so/cf4fcfa271e247329472628f3f164f6d" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString"><a class="SemanticString__Fragment SemanticString__Fragment--Link" href="https://blog.duyunzhi.cn/archives/centos7-an-zhuang-docker">docker安装</a></span><span class="SemanticString"><a class="SemanticString__Fragment SemanticString__Fragment--Link" href="https://blog.duyunzhi.cn/archives/an-zhuang-docker-compose">docker-compose安装</a></span></span></p></div><h3 id="https://www.notion.so/6b586ddbe2b9491fb037be2940be26d1" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/6b586ddbe2b9491fb037be2940be26d1"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">生成Harbor自签名证书</span></span></h3><div id="https://www.notion.so/2883f15b10e34b2180954fb3656a3fa8" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">这里我们使用https://github.com/Fishdrowned/ssl提供的shell脚本生成ssl证书</span></span></p></div><pre id="https://www.notion.so/bb4d9bf76edb48ed96548115d58dd303" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>git clone &lt;https://github.com/Fishdrowned/ssl.git&gt;
+
+cd ssl
+</span></span></span></code></pre><div id="https://www.notion.so/6de6b3689036474b8cda5904b1fdb040" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">如果需要修改CA、证书相关信息，可以编辑ca.cnf和gen.cert.sh替换对应的内容</span></span></p></div><pre id="https://www.notion.so/ae0fee0893ee4198bc989b445c39d4c4" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>./gen.cert.sh harbor.duyunzhi.cn</span></span></span></code></pre><div id="https://www.notion.so/2bee8ad2e3244890b1e8f0319e9a3d16" class="Image Image--PageWidth"><figure><a href="https://www.notion.so/signed/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1f77dc63-fd57-443e-87be-f4fe34a01b1c%2Fb39e438f-e7cc-43da-ad0c-4a18d42b096e%2FUntitled.png?width=2000&amp;table=block&amp;id=2bee8ad2-e324-4890-b1e8-f0319e9a3d16"><img src="https://www.notion.so/signed/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1f77dc63-fd57-443e-87be-f4fe34a01b1c%2Fb39e438f-e7cc-43da-ad0c-4a18d42b096e%2FUntitled.png?width=2000&amp;table=block&amp;id=2bee8ad2-e324-4890-b1e8-f0319e9a3d16" style="width:100%"/></a><figcaption><span class="SemanticStringArray"></span></figcaption></figure></div><div id="https://www.notion.so/8c5565202e46497088bd94849aec4260" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">该目录下会生成一个</span></span></p></div><pre id="https://www.notion.so/6787f10a09b44ad5878049ca42eac06d" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>out</span></span></span></code></pre><div id="https://www.notion.so/b358bc25c5c94e428115fe1ade965a2f" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">目录，里面的</span></span></p></div><pre id="https://www.notion.so/5f333d1de5c846b6b45cdbcecae84678" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>harbor.duyunzhi.cn</span></span></span></code></pre><div id="https://www.notion.so/1efeb927ca0b46469674efc6bac8cb55" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">存放了生成的证书</span></span></p></div><div id="https://www.notion.so/93d7a2ec366242bba31f19a66eebc5f8" class="Image Image--PageWidth"><figure><a href="https://www.notion.so/signed/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1f77dc63-fd57-443e-87be-f4fe34a01b1c%2Fd97811ee-cfc9-40bd-9712-2bcc62db0923%2FUntitled.png?width=2000&amp;table=block&amp;id=93d7a2ec-3662-42bb-a31f-19a66eebc5f8"><img src="https://www.notion.so/signed/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1f77dc63-fd57-443e-87be-f4fe34a01b1c%2Fd97811ee-cfc9-40bd-9712-2bcc62db0923%2FUntitled.png?width=2000&amp;table=block&amp;id=93d7a2ec-3662-42bb-a31f-19a66eebc5f8" style="width:100%"/></a><figcaption><span class="SemanticStringArray"></span></figcaption></figure></div><div id="https://www.notion.so/7a379ef78cdc467892fd723244e4114c" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">其中</span></span></p></div><pre id="https://www.notion.so/83ad56d41d7a4f1480e2ea80115d05f6" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>harbor.duyunzhi.cn.bundle.crt</span></span></span></code></pre><div id="https://www.notion.so/1c454402be8e41139d5ad7a603f60533" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">是我们需要的证书，</span></span></p></div><pre id="https://www.notion.so/5b20df8c0b324de3911c05498238e694" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>harbor.duyunzhi.cn.key.pem</span></span></span></code></pre><div id="https://www.notion.so/0a2156bbe2f44a8a8c8a4a1f7361c2d8" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">是秘钥存储文件</span></span></p></div><h3 id="https://www.notion.so/cd899ac38c0d4c2b8cc77f3fb071d6f0" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/cd899ac38c0d4c2b8cc77f3fb071d6f0"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">配置Harbor的https证书</span></span></h3><div id="https://www.notion.so/8f8d329f3cfd41b29069fb74333625b4" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">下载harbor离线安装文件</span></span></p></div><pre id="https://www.notion.so/80c69d962d4442fdaf3470f99e9aa98c" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>wget &lt;https://github.com/goharbor/harbor/releases/download/v2.6.0/harbor-offline-installer-v2.6.0.tgz&gt;
+
+tar -zxvf harbor-offline-installer-v2.6.0.tgz
+</span></span></span></code></pre><div id="https://www.notion.so/79b19e89ae804084be2bab7ba205ef7e" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">进入到解压好的harbor安装目录</span></span></p></div><pre id="https://www.notion.so/b0cd431741e24f3c8bc1b68b45445d6f" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>cd yourPath/harbor
+
+mkdir cert
+
+cd cert
+
+mv yourPath/ssl/out/harbor.duyunzhi.cn/harbor.duyunzhi.cn.bundle.crt .
+
+mv yourPath/ssl/out/harbor.duyunzhi.cn/harbor.duyunzhi.cn.key.pem .
+
+cd yourPath/harbor
+
+cp harbor.yml.tmpl harbor.yml
+
+vim harbor.yml
+
+修改以下配置：
+
+hostname: harbor.duyunzhi.cn
+
+https:
+  # https port for harbor, default is 443
+  # port: 8443
+  # The path of cert and key files for nginx
+  certificate: yourPath/harbor/cert/harbor.duyunzhi.cn.bundle.crt
+  private_key: yourPath/harbor/cert/harbor.duyunzhi.cn.key.pem
+</span></span></span></code></pre><h3 id="https://www.notion.so/145b197111b14c929b9e137630ad1982" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/145b197111b14c929b9e137630ad1982"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">重新配置启动Harbor</span></span></h3><pre id="https://www.notion.so/4e84a730aa87438193023966a136acef" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>./prepare
+
+./install.sh
+</span></span></span></code></pre><h3 id="https://www.notion.so/f6465bfdbb444af4a12d42febf335ae9" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/f6465bfdbb444af4a12d42febf335ae9"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">编辑hosts文件以域名方式访问</span></span></h3><div id="https://www.notion.so/a1b2d9e569cb40cdb1ef0a63535562da" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">在需要访问</span><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">harbor</strong></span><span class="SemanticString">机器上配置域名映射</span></span></p></div><pre id="https://www.notion.so/50010b8855a84469a2f5f78415d45fdd" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>vim /etc/hosts
+
+192.168.1.1 harbor.duyunzhi.cn</span></span></span></code></pre><h2 id="https://www.notion.so/a16315d24b1c4fafbc7cae35e793e7ec" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/a16315d24b1c4fafbc7cae35e793e7ec"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">安装Containerd</span></span></h2><div id="https://www.notion.so/67da52c02ae644db9cdd0f87bbaf348a" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">CentOS 8.x</code></span><span class="SemanticString">默认安装了</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">podman</code></span><span class="SemanticString">，需要先卸载</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">podman</code></span><span class="SemanticString">，否则可能会冲突导致安装失败</span></span></p></div><pre id="https://www.notion.so/029640cda2114c77bf07661c05e5e7d9" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>yum -y erase podman buildah</span></span></span></code></pre><h3 id="https://www.notion.so/efef0713bf584e528b9da0841ab5fef6" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/efef0713bf584e528b9da0841ab5fef6"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">安装</span></span></h3><pre id="https://www.notion.so/06cf76e601b94e589bd9d6e8dbb1c42a" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>yum-config-manager --add-repo &lt;http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo&gt;
+
+yum install containerd -y
+
+systemctl enable containerd.service</span></span></span></code></pre><h3 id="https://www.notion.so/fed55784aa4e4843a5d05625c42ddc0d" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/fed55784aa4e4843a5d05625c42ddc0d"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">生成默认配置</span></span></h3><pre id="https://www.notion.so/f01b60ff743b45749f7f036999dce796" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>containerd config default &gt; /etc/containerd/config.toml</span></span></span></code></pre><h3 id="https://www.notion.so/f884ddf286864275a9a0e9f32b3c4529" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/f884ddf286864275a9a0e9f32b3c4529"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">修改CgroupDriver为systemd</span></span></h3><div id="https://www.notion.so/56728d520b924d7fa4c2f950927d8c9c" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">k8s官方推荐使用systemd类型的CgroupDriver</span></span></p></div><pre id="https://www.notion.so/d6c39e29aa3f436a8c1c12b96d629980" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>[plugins.&quot;io.containerd.grpc.v1.cri&quot;.containerd.runtimes.runc]
+  ...
+  [plugins.&quot;io.containerd.grpc.v1.cri&quot;.containerd.runtimes.runc.options]
+    SystemdCgroup = true</span></span></span></code></pre><h3 id="https://www.notion.so/f13b6eed4ebd462fa40d74cafbaaa58b" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/f13b6eed4ebd462fa40d74cafbaaa58b"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">配置国内镜像源，私有harbor仓库</span></span></h3><pre id="https://www.notion.so/0270c71a29a04b70acdaf71d0aa1e686" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>...
+   [plugins.&quot;io.containerd.grpc.v1.cri&quot;.registry]
+      config_path = &quot;&quot;
+
+      [plugins.&quot;io.containerd.grpc.v1.cri&quot;.registry.auths]
+
+      [plugins.&quot;io.containerd.grpc.v1.cri&quot;.registry.configs]
+        [plugins.&quot;io.containerd.grpc.v1.cri&quot;.registry.configs.&quot;harbor.duyunzhi.cn&quot;.tls]
+          insecure_skip_verify = true
+ [plugins.&quot;io.containerd.grpc.v1.cri&quot;.registry.configs.&quot;harbor.duyunzhi.cn&quot;.auth]
+          username = &quot;admin&quot;
+          password = &quot;Harbor12345&quot;
+
+      [plugins.&quot;io.containerd.grpc.v1.cri&quot;.registry.headers]
+
+      [plugins.&quot;io.containerd.grpc.v1.cri&quot;.registry.mirrors]
+        [plugins.&quot;io.containerd.grpc.v1.cri&quot;.registry.mirrors.&quot;docker.io&quot;]
+            endpoint = [&quot;&lt;https://docker.mirrors.ustc.edu.cn&gt;&quot;,&quot;&lt;http://hub-mirror.c.163.com&gt;&quot;]
+        [plugins.&quot;io.containerd.grpc.v1.cri&quot;.registry.mirrors.&quot;gcr.io&quot;]
+            endpoint = [&quot;&lt;https://gcr.mirrors.ustc.edu.cn&gt;&quot;]
+        [plugins.&quot;io.containerd.grpc.v1.cri&quot;.registry.mirrors.&quot;k8s.gcr.io&quot;]
+            endpoint = [&quot;&lt;https://gcr.mirrors.ustc.edu.cn/google-containers&gt;&quot;]
+        [plugins.&quot;io.containerd.grpc.v1.cri&quot;.registry.mirrors.&quot;quay.io&quot;]
+            endpoint = [&quot;&lt;https://quay.mirrors.ustc.edu.cn&gt;&quot;]
+        [plugins.&quot;io.containerd.grpc.v1.cri&quot;.registry.mirrors.&quot;harbor.duyunzhi.cn&quot;]
+            endpoint = [&quot;&lt;https://harbor.duyunzhi.cn&gt;&quot;]
+...</span></span></span></code></pre><h3 id="https://www.notion.so/e0399256b6cb44edba52db588dfc94da" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/e0399256b6cb44edba52db588dfc94da"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">重启containerd</span></span></h3><pre id="https://www.notion.so/97f9524cb3d54a86b27c9453c66d3bd6" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>systemctl daemon-reload &amp;&amp; systemctl restart containerd.service</span></span></span></code></pre><h2 id="https://www.notion.so/88d43d6b3ec54c0ea2eca3f7e7a109b7" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/88d43d6b3ec54c0ea2eca3f7e7a109b7"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">安装客户端管理工具(crictl)</span></span></h2><div id="https://www.notion.so/6c89b0676ce04c6082ef7fb7400ba099" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">Containerd常用的客户端管理工具有：</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">ctr</code></span><span class="SemanticString">、</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">crictl</code></span><span class="SemanticString">、</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">nerdctl</code></span></span></p></div><blockquote id="https://www.notion.so/8186deab41794c0ea446685082755ab9" class="ColorfulBlock ColorfulBlock--ColorDefault Quote"><span class="SemanticStringArray"><span class="SemanticString">ctr是作为 containerd 项目的一部分提供的命令行客户端
+crictl是一个命令行客户端，用于Kubernetes cri兼容的容器运行时
+nerdctl是一个相对较新的containerd命令行客户端。与ctr不同，nerdctl的目标是用户友好和docker兼容。在某种程度上，nerdctl + containerd可以无缝地替代docker + dockerd</span></span></blockquote><h3 id="https://www.notion.so/1436541bdd064a019540018146fb97f2" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/1436541bdd064a019540018146fb97f2"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">下载</span></span></h3><pre id="https://www.notion.so/32b0c5476ffd48c197233df9d99fb2ff" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>wget &lt;https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.25.0/crictl-v1.25.0-linux-amd64.tar.gz&gt;
+
+tar -zxvf crictl-v1.25.0-linux-amd64.tar.gz
+
+mv crictl /usr/local/bin/</span></span></span></code></pre><ul class="BulletedListWrapper"><li id="https://www.notion.so/6156bf74314f4a8b91bf68dc54bf38bd" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString">编写配置文件</span></span></li></ul><pre id="https://www.notion.so/e7ededc07f274930a1cc41f99b47f8af" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>cat &gt; /etc/crictl.yaml &lt;&lt;EOF
+runtime-endpoint: unix:///var/run/containerd/containerd.sock
+image-endpoint: unix:///var/run/containerd/containerd.sock
+timeout: 10
+debug: false
+pull-image-on-create: false
+EOF</span></span></span></code></pre><h3 id="https://www.notion.so/c1d25a03570d45bd8f2b355c40953205" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/c1d25a03570d45bd8f2b355c40953205"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">拉取镜像</span></span></h3><pre id="https://www.notion.so/0536783c351b4d32bdc76c7cc81d3fde" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>critcl pull harbor.duyunzhi.cn/xxx:latest</span></span></span></code></pre></article>
+  <footer class="Footer">
+  <div>&copy; Yunis 2023</div>
+  <div>&centerdot;</div>
+  <div>Powered by <a href="https://github.com/dragonman225/notablog" target="_blank"
+      rel="noopener noreferrer">Notablog</a>.
+  </div>
+</footer>
+</body>
+
+</html>

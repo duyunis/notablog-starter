@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- iOS Safari -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- Chrome, Firefox OS and Opera Status Bar Color -->
+<meta name="theme-color" content="#FFFFFF">
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css">
+<link rel="stylesheet" type="text/css"
+  href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/themes/prism.min.css">
+<link rel="stylesheet" type="text/css" href="css/SourceSansPro.css">
+<link rel="stylesheet" type="text/css" href="css/theme.css">
+<link rel="stylesheet" type="text/css" href="css/notablog.css">
+<!-- Favicon -->
+
+  <link rel="shortcut icon" href="https://www.notion.so/signed/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1f77dc63-fd57-443e-87be-f4fe34a01b1c%2F33a333ec-e8ab-46ba-a2ba-41d00305f0a3%2FIMG_4473.jpg?table=collection&amp;id=5c375d43-ac6b-41d5-916c-20602072e1b0">
+
+<style>
+  :root {
+    font-size: 20px;
+  }
+</style>
+  <title>k8s集群的pod无法访问service&nbsp;|&nbsp;Yunis</title>
+  <meta property="og:type" content="blog">
+  <meta property="og:title" content="k8s集群的pod无法访问service">
+  
+  
+  <style>
+    .DateTagBar {
+      margin-top: 1.0rem;
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="Navbar">
+  <a href="index.html">
+    <div class="Navbar__Btn">
+      
+        <span><img class="inline-img-icon" src="https://www.notion.so/signed/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1f77dc63-fd57-443e-87be-f4fe34a01b1c%2F33a333ec-e8ab-46ba-a2ba-41d00305f0a3%2FIMG_4473.jpg?table=collection&amp;id=5c375d43-ac6b-41d5-916c-20602072e1b0"></span>&nbsp;
+      
+      <span>Home</span>
+    </div>
+  </a>
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      <span class="Navbar__Delim">&centerdot;</span>
+      <a href="about.html">
+        <div class="Navbar__Btn">
+          
+            <span><img class="inline-img-icon" src="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;😀&lt;/text&gt;&lt;/svg&gt;"></span>&nbsp;
+          
+          <span>About</span>
+        </div>
+      </a>
+    
+  
+</nav>
+  <header class="Header">
+    
+    <div class="Header__Spacer Header__Spacer--NoCover">
+    </div>
+    
+    <h1 class="Header__Title">k8s集群的pod无法访问service</h1>
+    
+      <div class="DateTagBar">
+        
+          <span class="DateTagBar__Item DateTagBar__Date">Posted on Wed, Sep 28, 2022</span>
+        
+        
+          <span class="DateTagBar__Item DateTagBar__Tag DateTagBar__Tag--orange">
+            <a href="tag/k8s.html">k8s</a>
+          </span>
+        
+      </div>
+    
+  </header>
+  <article id="https://www.notion.so/3304fee3eb4147aabd038599f75c1458" class="PageRoot"><h2 id="https://www.notion.so/7d8435b7dca54deda0e059cabd78e875" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/7d8435b7dca54deda0e059cabd78e875"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">描述</span></span></h2><div id="https://www.notion.so/ec838f4fdcc840d2b77e28408fde2774" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">进入集群的任意一个pod，ping不通集群内的clusterIP和service</span></span></p></div><h2 id="https://www.notion.so/5368bff975464637a9e1df452d0b2a83" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/5368bff975464637a9e1df452d0b2a83"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">解决方案</span></span></h2><div id="https://www.notion.so/65c24e9697c74c8aa575c22c5eef44bb" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">开启</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">ipvs</code></span><span class="SemanticString">，我们需要修改</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">kube-proxy</code></span><span class="SemanticString">的配置文件,添加</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">mode</code></span><span class="SemanticString"> 为</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">ipvs</code></span></span></p></div><h3 id="https://www.notion.so/7214b071122d46c6a5201408b4d1fccb" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/7214b071122d46c6a5201408b4d1fccb"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">验证是否安装ipvs</span></span></h3><div id="https://www.notion.so/6c79ce3974744e7da8da278c908db92f" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">所有节点验证</span></span></p></div><pre id="https://www.notion.so/4518f030f6234da7a3d1551122ecc6a4" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>ipvsadm -Ln</span></span></span></code></pre><div id="https://www.notion.so/1d9568665fb144d1878f5eb74dad3b93" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">如下说明以安装：</span></span></p></div><div id="https://www.notion.so/6ba3dc28b85b4adf9ae6d1ca542e2093" class="Image Image--PageWidth"><figure><a href="https://www.notion.so/signed/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1f77dc63-fd57-443e-87be-f4fe34a01b1c%2F928c3305-988b-4de8-b766-3a4757a93619%2FUntitled.png?width=2000&amp;table=block&amp;id=6ba3dc28-b85b-4adf-9ae6-d1ca542e2093"><img src="https://www.notion.so/signed/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1f77dc63-fd57-443e-87be-f4fe34a01b1c%2F928c3305-988b-4de8-b766-3a4757a93619%2FUntitled.png?width=2000&amp;table=block&amp;id=6ba3dc28-b85b-4adf-9ae6-d1ca542e2093" style="width:100%"/></a><figcaption><span class="SemanticStringArray"></span></figcaption></figure></div><div id="https://www.notion.so/4c5d7f4ddfce440e817d8b3fb41465f3" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">如果没有安装</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">ipvs</code></span><span class="SemanticString">，在所有节点安装</span></span></p></div><pre id="https://www.notion.so/bf3f650005174204b68d9de7276833d9" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>yum install ipset ipvsadm -y</span></span></span></code></pre><div id="https://www.notion.so/65076ffa65404a2ea49244b114486fc0" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">设置</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">ipvs</code></span></span></p></div><pre id="https://www.notion.so/e58b03e3eda843479d37368a06fc2c56" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>cat &gt; /etc/sysconfig/modules/ipvs.modules &lt;&lt;EOF
+#!/bin/bash
+
+modprobe -- ip_vs
+modprobe -- ip_vs_rr
+modprobe -- ip_vs_wrr
+modprobe -- ip_vs_sh
+modprobe -- nf_conntrack_ipv4
+EOF
+
+chmod +x /etc/sysconfig/modules/ipvs.modules
+/bin/bash /etc/sysconfig/modules/ipvs.modules
+
+# 查看
+lsmod | grep -e ip_vs -e nf_conntrack_ipv4
+
+ip_vs_sh               16384  0
+ip_vs_wrr              16384  0
+ip_vs_rr               16384  43
+ip_vs                 172032  49 ip_vs_rr,ip_vs_sh,ip_vs_wrr
+nf_conntrack          172032  7 xt_conntrack,nf_nat,ip6t_MASQUERADE,ipt_MASQUERADE,xt_nat,nf_conntrack_netlink,ip_vs
+nf_defrag_ipv6         20480  2 nf_conntrack,ip_vs
+libcrc32c              16384  5 nf_conntrack,nf_nat,nf_tables,xfs,ip_vs</span></span></span></code></pre><h3 id="https://www.notion.so/188cd59c590e4e59b41f66812ff6beec" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/188cd59c590e4e59b41f66812ff6beec"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">修改</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">kube-proxy</code></span><span class="SemanticString">的配置文件,添加</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">mode</code></span><span class="SemanticString"> 为</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">ipvs</code></span></span></h3><pre id="https://www.notion.so/6b66dbf5fc294269a7bf83de362c5ecd" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>kubectl edit cm kube-proxy -n kube-system
+
+...
+mode: &quot;ipvs&quot;
+...
+
+:wq #保存</span></span></span></code></pre><h3 id="https://www.notion.so/433dea9dd9234872a1984aa531a10a94" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/433dea9dd9234872a1984aa531a10a94"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">重新创建</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">kube-proxy pod</code></span></span></h3><div id="https://www.notion.so/03dbede296574456a4189ccc4a2a0029" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">删除所有节点的</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">kube-proxy</code></span><span class="SemanticString"> </span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">pod</code></span><span class="SemanticString">，</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">DaemonSet</code></span><span class="SemanticString">会自动进行重建</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">kube-proxy</code></span><span class="SemanticString"> </span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">pod</code></span></span></p></div><pre id="https://www.notion.so/ca016830e0544c8895dbef7ff1eaecde" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>kubectl get pod -n kube-system
+
+kubectl delete pod kube-proxy-pffsm -n kube-system
+...</span></span></span></code></pre><h3 id="https://www.notion.so/4ba6e63e125f4ef39f33959e5d14e9d8" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/4ba6e63e125f4ef39f33959e5d14e9d8"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">测试ipvs模块是否开启成功</span></span></h3><pre id="https://www.notion.so/d90a289ce3d343fba0b83f9fa76814be" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>ipvsadm -Ln</span></span></span></code></pre></article>
+  <footer class="Footer">
+  <div>&copy; Yunis 2023</div>
+  <div>&centerdot;</div>
+  <div>Powered by <a href="https://github.com/dragonman225/notablog" target="_blank"
+      rel="noopener noreferrer">Notablog</a>.
+  </div>
+</footer>
+</body>
+
+</html>

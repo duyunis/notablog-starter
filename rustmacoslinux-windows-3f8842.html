@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- iOS Safari -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- Chrome, Firefox OS and Opera Status Bar Color -->
+<meta name="theme-color" content="#FFFFFF">
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css">
+<link rel="stylesheet" type="text/css"
+  href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/themes/prism.min.css">
+<link rel="stylesheet" type="text/css" href="css/SourceSansPro.css">
+<link rel="stylesheet" type="text/css" href="css/theme.css">
+<link rel="stylesheet" type="text/css" href="css/notablog.css">
+<!-- Favicon -->
+
+  <link rel="shortcut icon" href="https://www.notion.so/signed/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1f77dc63-fd57-443e-87be-f4fe34a01b1c%2F33a333ec-e8ab-46ba-a2ba-41d00305f0a3%2FIMG_4473.jpg?table=collection&amp;id=5c375d43-ac6b-41d5-916c-20602072e1b0">
+
+<style>
+  :root {
+    font-size: 20px;
+  }
+</style>
+  <title>Rust在MacOS上交叉编译Linux/Windows平台&nbsp;|&nbsp;Yunis</title>
+  <meta property="og:type" content="blog">
+  <meta property="og:title" content="Rust在MacOS上交叉编译Linux/Windows平台">
+  
+  
+  <style>
+    .DateTagBar {
+      margin-top: 1.0rem;
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="Navbar">
+  <a href="index.html">
+    <div class="Navbar__Btn">
+      
+        <span><img class="inline-img-icon" src="https://www.notion.so/signed/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F1f77dc63-fd57-443e-87be-f4fe34a01b1c%2F33a333ec-e8ab-46ba-a2ba-41d00305f0a3%2FIMG_4473.jpg?table=collection&amp;id=5c375d43-ac6b-41d5-916c-20602072e1b0"></span>&nbsp;
+      
+      <span>Home</span>
+    </div>
+  </a>
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      <span class="Navbar__Delim">&centerdot;</span>
+      <a href="about.html">
+        <div class="Navbar__Btn">
+          
+            <span><img class="inline-img-icon" src="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;😀&lt;/text&gt;&lt;/svg&gt;"></span>&nbsp;
+          
+          <span>About</span>
+        </div>
+      </a>
+    
+  
+</nav>
+  <header class="Header">
+    
+    <div class="Header__Spacer Header__Spacer--NoCover">
+    </div>
+    
+    <h1 class="Header__Title">Rust在MacOS上交叉编译Linux/Windows平台</h1>
+    
+      <div class="DateTagBar">
+        
+          <span class="DateTagBar__Item DateTagBar__Date">Posted on Sun, Jan 29, 2023</span>
+        
+        
+          <span class="DateTagBar__Item DateTagBar__Tag DateTagBar__Tag--purple">
+            <a href="tag/Rust.html">Rust</a>
+          </span>
+        
+      </div>
+    
+  </header>
+  <article id="https://www.notion.so/3f88420653f64c04beb992cc09772b79" class="PageRoot"><h2 id="https://www.notion.so/b8c20d8a5a944e26a8e36550565e448d" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/b8c20d8a5a944e26a8e36550565e448d"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">交叉编译</span></span></h2><blockquote id="https://www.notion.so/de83957056fb43488bf215edd0e81342" class="ColorfulBlock ColorfulBlock--ColorDefault Quote"><span class="SemanticStringArray"><span class="SemanticString">交叉编译是在一个平台上生成另一个平台上的可执行代码。 同一个体系结构可以运行不同的操作系统。同样，同一个操作系统也可以在不同的体系结构上运行。</span></span></blockquote><h2 id="https://www.notion.so/2eec2542bc2d42179bc74fa347fabe45" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/2eec2542bc2d42179bc74fa347fabe45"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">交叉编译Linux程序</span></span></h2><h3 id="https://www.notion.so/d134064e7eb945bfac90dd30caf3b31d" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/d134064e7eb945bfac90dd30caf3b31d"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">使用musl工具链</span></span></h3><div id="https://www.notion.so/20cc3f3e701240cf92831f5e3735f5f3" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">musl实现了Linux libc，质量可靠，适配所有Linux环境，使用静态连接替换动态链接，这样就能打出一个完整的二进制文件，可以丢到任何Linux环境里运行。</span></span></p></div><ul class="BulletedListWrapper"><li id="https://www.notion.so/c599b282ceb94716811555bf654d9282" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString">安装target</span></span></li></ul><pre id="https://www.notion.so/c1a80ce4616f4d9593ee4fed1ce142b9" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>rustup target add x86_64-unknown-linux-musl
+</span></span></span></code></pre><ul class="BulletedListWrapper"><li id="https://www.notion.so/08bd74d082cc4ed58de877a3764d3aef" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString">安装musl-cross</span></span></li></ul><pre id="https://www.notion.so/22da35cd14074ddd853003626267d971" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>brew install filosottile/musl-cross/musl-cross
+</span></span></span></code></pre><ul class="BulletedListWrapper"><li id="https://www.notion.so/3d5ef6f4eb6144e0bc6db53f37ed5241" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString">配置</span></span></li></ul><pre id="https://www.notion.so/02442efc0f3b4cef8fa1a176af0375ce" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>vim ~/.cargo/config.toml
+</span></span></span></code></pre><div id="https://www.notion.so/9b1f291852f64a37a6a75a20fb19d6cd" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">没有这个文件就创建一个
+加入以下内容：</span></span></p></div><pre id="https://www.notion.so/282dfba4c4e64bce98ac8235ce08a67a" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>[target.x86_64-unknown-linux-musl]
+linker = &quot;x86_64-linux-musl-gcc&quot;
+</span></span></span></code></pre><ul class="BulletedListWrapper"><li id="https://www.notion.so/e7b3d9d9539148f7824328c8d7241fa8" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString">构建</span></span></li></ul><pre id="https://www.notion.so/e8da0367600343b1be4d26608e9aef00" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>cargo build --release --target x86_64-unknown-linux-musl
+</span></span></span></code></pre><div id="https://www.notion.so/07f19971fdae40b9991876d1aed6aeca" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">如果要是你的程序依赖原生库，需要设置一个环境变量</strong></span></span></p></div><pre id="https://www.notion.so/328f749e2cce46c2bae9744f04354fe5" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>CC_x86_64_unknown_linux_musl=x86_64-linux-musl-gcc cargo build --release --target x86_64-unknown-linux-musl
+</span></span></span></code></pre><h2 id="https://www.notion.so/34e6006a7d4742a39eda8bbd094e6d17" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/34e6006a7d4742a39eda8bbd094e6d17"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">交叉编译Windows程序</span></span></h2><h3 id="https://www.notion.so/fa86a60228024abe88ca662150500c89" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/fa86a60228024abe88ca662150500c89"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">使用windows-gnu</span></span></h3><blockquote id="https://www.notion.so/188bc49adb634521b81cb8610cfd0365" class="ColorfulBlock ColorfulBlock--ColorDefault Quote"><span class="SemanticStringArray"><span class="SemanticString">用msvc容易编译失败，msvc其实就是指编译出来的程序直接依赖Windows平台的基础库，而gnu的则是开源的基础库直接内嵌到编译的程序里，所以msvc的程序要更小。</span></span></blockquote><ul class="BulletedListWrapper"><li id="https://www.notion.so/0f1d1a4495d1420c8e7da3d3d72e8063" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString">安装target</span></span></li></ul><pre id="https://www.notion.so/684f235ba5134220ad1975850fb3dbef" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>rustup target add x86_64-pc-windows-gnu
+</span></span></span></code></pre><ul class="BulletedListWrapper"><li id="https://www.notion.so/1d422b4c38c946fe819a829ccecb635d" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString">安装mingw-w64</span></span></li></ul><pre id="https://www.notion.so/7e102155fbe7438ab46d0e0502a96c20" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>brew install mingw-w64
+</span></span></span></code></pre><ul class="BulletedListWrapper"><li id="https://www.notion.so/44419a34509f455ab056a001af4fdc8f" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString">配置</span></span></li></ul><pre id="https://www.notion.so/70f1ebe3dede4f81b9fbd9f9a906089e" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>vim ~/.cargo/config.toml
+</span></span></span></code></pre><div id="https://www.notion.so/e5c92499745b45c694a0009a056c3120" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">加入以下内容：</span></span></p></div><pre id="https://www.notion.so/82221b82015244319a80b7e4f48930e3" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>[target.x86_64-pc-windows-gnu]
+linker = &quot;x86_64-w64-mingw32-gcc&quot;
+ar = &quot;x86_64-w64-mingw32-gcc-ar&quot;
+</span></span></span></code></pre><ul class="BulletedListWrapper"><li id="https://www.notion.so/01156660c4e24aeeae89c129e0c0f934" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString">构建</span></span></li></ul><pre id="https://www.notion.so/ce14e18d710443d5ab16cab73884e465" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>cargo build --release --target x86_64-pc-windows-gnu
+</span></span></span></code></pre></article>
+  <footer class="Footer">
+  <div>&copy; Yunis 2023</div>
+  <div>&centerdot;</div>
+  <div>Powered by <a href="https://github.com/dragonman225/notablog" target="_blank"
+      rel="noopener noreferrer">Notablog</a>.
+  </div>
+</footer>
+</body>
+
+</html>
